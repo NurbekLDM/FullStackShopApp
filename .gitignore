@@ -1,0 +1,50 @@
+# Node.js uchun
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Operatsion tizim hosil qiladigan fayllar
+.DS_Store
+Thumbs.db
+
+# Muhit sozlamalari
+.env
+.env.local
+.env.*.local
+
+# Cache va ishlab chiqilgan kodlar
+/.next/
+/out/
+/dist/
+/build/
+/.cache/
+.vscode/
+.idea/
+
+# Test qoldiqlari
+coverage/
+*.lcov
+
+# Git fayllari uchun maxsus sozlamalar
+.git/
+.gitconfig
+
+# React.js uchun maxsus
+.eslintcache
+public/*.cache
+public/*.map
+*.log
+*.lock
+**/*.log
+
+# Express.js loyihasi uchun
+logs/
+*.log
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# Nodemon sozlamalari
+nodemon-debug.log*
