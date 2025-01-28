@@ -427,6 +427,83 @@ app.delete('/cards/:id', async (req, res) => {
     }
 });
 
-app.listen(port, () => {
-    console.log(`Server running on port ${port}`);
+
+// get category
+app.get('/category', async (req, res) => {
+    try {
+        const { data, error } = await supabase
+            .from('categories')
+            .select('*');
+
+        if (error) throw error;
+
+        res.json(data);
+    } catch (error) {
+        res.status(500).json({
+            message: 'Internal Server Error'
+        });
+    }
 });
+
+//add category
+app.post('/addCategory', async (req, res) => {
+    const { name } = req.body;
+
+    try{
+        const { data, error } = await supabase
+            .from('categories')
+            .insert([{ name }])
+            .single();
+
+        if (error) throw error;
+
+        res.status(201).json(data);
+    }catch (err){
+        res.status(500).json({
+            message: 'Internal Server Error'
+        });
+    }
+})
+
+// edit category
+app.put('/updateCategory/:id', async (req, res) => {
+    const id = req.params.id;
+    const { name } = req.body;
+
+    try{
+        const { data, error } = await supabase
+            .from('categories')
+            .update({ name })
+            .eq('id', id)
+            .single();
+
+        if (error) throw error;
+
+        res.json(data);
+    } catch (error){
+        res.status(500).json({
+            message: 'Internal Server Error'
+        });
+    }
+});
+
+// delete category
+app.delete('/deleteCategory/:id', async (req, res) => {
+    const id = req.params.id;
+
+    try{
+        const { data, error } = await supabase
+            .from('categories')
+            .delete()
+            .eq('id', id)
+            .single();
+
+        if (error) throw error;
+
+        res.json(data);
+    } catch (error){
+        res.status(500).json({
+            message: 'Internal Server Error'
+        });
+    }
+})
