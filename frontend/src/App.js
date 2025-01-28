@@ -5,6 +5,7 @@ import './App.css';
 import ReactDOM from "react-dom/client";
 import LoginPage from "./pages/login";
 import HomePage from "./pages/home";
+import ProductDetails from './components/productDetails';
 
 export default function App() {
   return (
@@ -13,6 +14,7 @@ export default function App() {
         <Route path="/" element={<HomePage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path= "/login" element={<LoginPage />} />
+        <Route path="/product" element={<ProductDetails />} />
       </Routes>
     </BrowserRouter>
   );

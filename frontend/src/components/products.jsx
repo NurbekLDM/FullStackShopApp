@@ -1,8 +1,10 @@
 import React , {useEffect, useState} from 'react'
 import { getAllProducts } from '../servers/product'
-
+import { useNavigate } from 'react-router-dom'
 
 export default function Products() {
+
+    const navigate = useNavigate()
 
     const [products, setProducts] = useState([])
     const [isModelOpen, setIsModelOpen] = useState(false)
@@ -40,6 +42,9 @@ export default function Products() {
 
     })
 
+    const handleClick = () =>{
+       navigate(`/product`)
+    }
 
     useEffect(()=>{
         const fetchProducts = async()=>{
@@ -108,9 +113,10 @@ export default function Products() {
     </div>
   </div>
   <div className="mb-4 grid gap-4 sm:grid-cols-2 md:mb-8 lg:grid-cols-3 xl:grid-cols-4">
+    
     <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800">
-      <div className="h-56 w-full">
-        <a href="#">
+      <div  className="h-56 w-full">
+        <a href="/product">
           <img className="mx-auto h-full dark:hidden" src="https://flowbite.s3.amazonaws.com/blocks/e-commerce/imac-front.svg" alt="" />
           <img className="mx-auto hidden h-full dark:block" src="https://flowbite.s3.amazonaws.com/blocks/e-commerce/imac-front-dark.svg" alt="" />
         </a>
@@ -202,6 +208,7 @@ export default function Products() {
         </div>
       </div>
     </div>
+
     <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800">
       <div className="h-56 w-full">
         <a href="#">
