@@ -157,19 +157,21 @@ app.get('/userProfile/:id', async (req, res) => {
 
 // get all users 
 app.get('/users', async (req, res) => {
-    try{
+    try {
         const { data, error } = await supabase
             .from('users')
             .select('*');
 
-        if (error) throw error;
+        if (error) {
+            console.error('Supabase error:', error);
+            return res.status(500).json({ message: 'Internal Server Error' });
+        }
+
 
         res.json(data);
-    } catch (error){
-        console.log(error)
-        res.status(500).json({
-            message: 'Internal Server Error'
-        });
+    } catch (error) {
+        console.error('Catch error:', error);
+        res.status(500).json({ message: 'Internal Server Error' });
     }
 });
 
