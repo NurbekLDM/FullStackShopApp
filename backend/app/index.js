@@ -17,6 +17,7 @@ const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_KEY;
 const supabase = createClient(supabaseUrl, supabaseKey);
 
+// multer orqali rasmni yuklash uchun
 const storage = multer.memoryStorage();
 const upload = multer({storage: storage});
 
