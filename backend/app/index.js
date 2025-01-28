@@ -429,7 +429,7 @@ app.delete('/cards/:id', async (req, res) => {
 
 
 // get category
-app.get('/category', async (req, res) => {
+app.get('/categories', async (req, res) => {
     try {
         const { data, error } = await supabase
             .from('categories')
