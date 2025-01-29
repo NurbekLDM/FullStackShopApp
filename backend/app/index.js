@@ -13,6 +13,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 app.use(express.json());
 
+
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_KEY;
 const supabase = createClient(supabaseUrl, supabaseKey);
