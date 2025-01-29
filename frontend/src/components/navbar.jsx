@@ -74,7 +74,7 @@ export default function Navbar(){
 
                         <ul className="hidden lg:flex items-center justify-start gap-6 md:gap-8 py-3 sm:justify-center">
                             <li>
-                                <a href="#" title=""
+                                <a href="/" title=""
                                    className="flex text-sm font-medium text-gray-900 hover:text-primary-700 dark:text-white dark:hover:text-primary-500">
                                     Home
                                 </a>
@@ -306,7 +306,7 @@ export default function Navbar(){
                         </div>
                     </div>
 
-                    <a href="#" title=""
+                    <a href="/checkout" title=""
                        className="mb-2 me-2 inline-flex w-full items-center justify-center rounded-lg bg-primary-700 px-5 py-2.5 text-sm font-medium text-white hover:bg-primary-800 focus:outline-none focus:ring-4 focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
                        role="button"> Proceed to Checkout </a>
                 </div>

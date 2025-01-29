@@ -2,6 +2,7 @@ import React from "react";
 import Navbar from "./navbar";
 import { getProduct } from "../servers/product";
 import ProductComments from "./productComments";
+import Footer from "./footer";
 
 export default function ProductDetails() {
     return (
@@ -187,6 +188,8 @@ export default function ProductDetails() {
   </section>
 
 <ProductComments />
+
+<Footer />
         </div>
     );
 }

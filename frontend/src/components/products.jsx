@@ -2,6 +2,7 @@ import React , {useEffect, useState} from 'react'
 import { getAllProducts } from '../servers/product'
 import { useNavigate } from 'react-router-dom'
 
+
 export default function Products() {
 
     const navigate = useNavigate()
@@ -1444,6 +1445,9 @@ export default function Products() {
 </section>
             
             {/* ))} */}
+
+
+
         </div>
     )
 }
