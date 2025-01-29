@@ -18,6 +18,7 @@ const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_KEY;
 const supabase = createClient(supabaseUrl, supabaseKey);
 
+console.log('supabaseUrl:', supabaseUrl);
 // multer orqali rasmni yuklash uchun
 const storage = multer.memoryStorage();
 const upload = multer({storage: storage});
@@ -508,3 +509,7 @@ app.delete('/deleteCategory/:id', async (req, res) => {
         });
     }
 })
+
+app.listen(port, () => {
+    console.log(`Server is running on port ${port}`);
+});
