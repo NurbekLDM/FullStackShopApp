@@ -7,6 +7,10 @@ import LoginPage from "./pages/login";
 import HomePage from "./pages/home";
 import ProductDetails from './components/productDetails';
 import CheckoutPage from './pages/checkout';
+import Payment from './pages/payment';
+import OrdersPage from "./pages/orders";
+import OrderDetails from "./pages/orderDetails";
+import Favourites from "./pages/favourites";
 
 export default function App() {
   return (
@@ -17,6 +21,10 @@ export default function App() {
         <Route path= "/login" element={<LoginPage />} />
         <Route path="/product" element={<ProductDetails />} />
         <Route path="/checkout" element={<CheckoutPage />} />
+        <Route path="/payment" element={<Payment />} />
+        <Route path="/orders" element={<OrdersPage />} />
+        <Route path="/orderDetails" element={<OrderDetails />} />
+        <Route path="/favourites" element={<Favourites />} />
       </Routes>
     </BrowserRouter>
   );

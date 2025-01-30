@@ -16,7 +16,6 @@ export default function Navbar(){
 
     useEffect(() => {
         const mobileMenuButton = document.querySelector('[data-collapse-toggle="ecommerce-navbar-menu-1"]');
-        const mobileMenu = document.getElementById('ecommerce-navbar-menu-1');
         const handleClick = () => {
             setIsMobileMenuOpen(prevState => !prevState);
         };
@@ -318,13 +317,13 @@ export default function Navbar(){
                         <li><a href="#" title=""
                                className="inline-flex md:text-sm w-full  items-center gap-2 rounded-md px-3 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-600"> My
                             Account </a></li>
-                        <li><a href="#" title=""
+                        <li><a href="/orders" title=""
                                className="inline-flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-600"> My
                             Orders </a></li>
                         <li><a href="#" title=""
                                className="inline-flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-600"> Settings </a>
                         </li>
-                        <li><a href="#" title=""
+                        <li><a href="/favourites" title=""
                                className="inline-flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-600"> Favourites </a>
                         </li>
                         <li><a href="#" title=""
