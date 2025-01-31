@@ -157,6 +157,27 @@ app.get('/userProfile/:id', async (req, res) => {
     }
 });
 
+// delete user
+app.delete('/deleteUser/:id', async (req, res) => {
+    const id = req.params.id;
+
+    try{
+        const { data, error } = await supabase
+            .from('users')
+            .delete()
+            .eq('id', id)
+            .single();
+
+        if (error) throw error;
+
+        res.json(data);
+    } catch (error){
+        res.status(500).json({
+            message: 'Internal Server Error'
+        });
+    }
+});
+
 // get all users 
 app.get('/users', async (req, res) => {
     try {
@@ -201,12 +222,12 @@ app.get('/products/:id', async (req, res) => {
 // add product
 app.post('/addProduct', upload.single('image'), async (req, res) => {
     try{
-        const {name , description , price , stock, category} = req.body;
+        const {name , description , price , stock, category, tag_name} = req.body;
         const image_data = req.file.buffer;
 
         const { data, error } = await supabase
             .from('products')
-            .insert([{ name, description, price, stock, category, image_data }])
+            .insert([{ name, description, price, stock, category, image_data, tag_name }])
             .single();
 
         if (error) throw error;
@@ -243,11 +264,11 @@ app.delete('/deleteProduct/:id', async (req, res) => {
 // edit product 
 app.put('/updateProduct/:id', upload.single('image'), async (req, res) => {
     const id = req.params.id;
-    const {name, description, price, stock, category} = req.body;
+    const {name, description, price, stock, category, tag_name} = req.body;
     const image_data = req.file ? req.file.buffer : null;
 
     try{
-        const updateFields = { name, description, price, stock, category };
+        const updateFields = { name, description, price, stock, category , tag_name };
         if (image_data) updateFields.image_data = image_data;
 
         const { data, error } = await supabase
@@ -509,6 +530,107 @@ app.delete('/deleteCategory/:id', async (req, res) => {
         });
     }
 })
+
+// add comment
+app.post('/addComment', async (req, res) => {
+    const { product_id , user_id, comment } = req.body;
+
+    try{
+        const { data, error } = await supabase
+            .from('comments')
+            .insert([{ product_id, user_id, comment }])
+            .single();
+
+        if (error) throw error;
+
+        res.status(201).json(data);
+    }catch (err){
+        res.status(500).json({
+            message: 'Internal Server Error'
+        });
+    }
+})
+
+// get comments by product id
+app.get('/comments/:id', async (req, res) => {
+    const id = req.params.id;
+
+    try{
+        const { data, error } = await supabase
+            .from('comments')
+            .select('*')
+            .eq('product_id', id);
+
+        if (error) throw error;
+
+        res.json(data);
+    } catch (error){
+        res.status(500).json({
+            message: 'Internal Server Error'
+        });
+    }
+})
+
+// delete comment
+app.delete('deleteComment/:id', async (req, res) => {
+    const id = req.params.id;
+
+    try{
+        const { data, error } = await supabase
+            .from('comments')
+            .delete()
+            .eq('id', id)
+            .single();
+
+        if (error) throw error;
+
+        res.json(data);
+    } catch (error){
+        res.status(500).json({
+            message: 'Internal Server Error'
+        });
+    }
+})
+
+// edit comment
+app.put('/updateComment/:id', async (req, res) => {
+    const id = req.params.id;
+    const { comment } = req.body;
+
+    try{
+        const { data, error } = await supabase
+            .from('comments')
+            .update({ comment })
+            .eq('id', id)
+            .single();
+
+        if (error) throw error;
+
+        res.json(data);
+    } catch (error){
+        res.status(500).json({
+            message: 'Internal Server Error'
+        });
+    }
+})
+
+// get all comments
+app.get('/comments', async (req, res) => {
+    try{
+        const { data, error } = await supabase
+            .from('comments')
+            .select('*');
+
+        if (error) throw error;
+
+        res.json(data);
+    } catch (error){
+        res.status(500).json({
+            message: 'Internal Server Error'
+        });
+    }
+})
+
 
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
