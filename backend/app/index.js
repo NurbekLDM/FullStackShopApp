@@ -632,6 +632,138 @@ app.get('/comments', async (req, res) => {
 })
 
 
+// add admin
+app.post('/addAdmin', async (req, res) => {
+    const { name ,username, password } = req.body;
+
+    try{
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        const { data, error } = await supabase
+            .from('admins')
+            .insert([{ name , username, password: hashedPassword }])
+            .single();
+
+        if (error) throw error;
+
+        res.status(201).json(data);
+    } catch (error){
+        res.status(500).json({
+            message: 'Internal Server Error'
+        });
+    }
+})
+
+// get admin information
+app.get('/admin/:id', async (req, res) => {
+    const id = req.params.id;
+
+    try{
+        const { data, error } = await supabase
+            .from('admins')
+            .select('*')
+            .eq('id', id)
+            .single();
+
+        if (error) throw error;
+
+        res.json(data);
+    } catch (error){
+        res.status(500).json({
+            message: 'Internal Server Error'
+        });
+    }
+})
+
+// admin login
+app.post('/adminLogin', async (req, res) => {
+    const { username, password } = req.body;
+
+    try{
+        const { data: admin, error } = await supabase
+            .from('admins')
+            .select('*')
+            .eq('username', username)
+            .single();
+
+        if (error || !admin){
+            return res.status(400).json({
+                message: 'Invalid username or password'
+            });
+        }
+
+        const isMatch = await bcrypt.compare(password, admin.password);
+        if (!isMatch){
+            return res.status(400).json({
+                message: 'Invalid username or password'
+            });
+        }
+
+        const token = jwt.sign(
+            {adminId: admin.id , username: admin.username},
+            'secret',
+            {expiresIn: '3h'}
+        );
+
+        res.json({
+            message: 'Admin logged in successfully',
+            token: token
+        });
+    } catch (error){
+        res.status(500).json({
+            message: 'Internal Server Error'
+        });
+    }
+})
+
+// delete admin
+app.delete('/deleteAdmin/:id', async (req, res) => {
+    const id = req.params.id;
+
+    try{
+        const { data, error } = await supabase
+            .from('admins')
+            .delete()
+            .eq('id', id)
+            .single();
+
+        if (error) throw error;
+
+        res.json(data);
+    } catch (error){
+        res.status(500).json({
+            message: 'Internal Server Error'
+        });
+    }
+})
+
+// edit admin
+app.put('/updateAdmin/:id', async (req, res) => {
+    const id = req.params.id;
+    const { name, username, password } = req.body;
+
+    try{
+        const updateFields = {};
+        if (name) updateFields.name = name;
+        if (username) updateFields.username = username;
+        if (password) updateFields.password = await bcrypt.hash(password, 10);
+
+        const { data, error } = await supabase
+            .from('admins')
+            .update(updateFields)
+            .eq('id', id)
+            .single();
+
+        if (error) throw error;
+
+        res.json(data);
+    } catch (error){
+        res.status(500).json({
+            message: 'Internal Server Error'
+        });
+    }
+})
+
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
 });
