@@ -11,6 +11,7 @@ export default function Products() {
 
   const handleFavourite = (product) => {
     const { id, name, price, image } = product;
+    console.log("Product is", product)
     const productData = { id, name, price, image };
     const favourites = JSON.parse(localStorage.getItem("favourites")) || [];
     favourites.push(productData);

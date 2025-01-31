@@ -348,7 +348,7 @@ export default function Navbar(){
                      className={` ${isMobileMenuOpen ? "" : "hidden"} z-10 absolute w-full  bg-gray-50 dark:bg-gray-700 dark:border-gray-600 border border-gray-200 rounded-lg py-3  px-4 mt-4 `}>
                     <ul className="text-gray-900 md:text-xl  text-sm font-medium space-y-3">
                         <li>
-                            <a href="#" className="hover:text-primary-700 dark:hover:text-primary-500">Home</a>
+                            <a href="/" className="hover:text-primary-700 dark:hover:text-primary-500">Home</a>
                         </li>
                         <li>
                             <a href="#" className="hover:text-primary-700 dark:hover:text-primary-500">Best Sellers</a>
