@@ -697,8 +697,10 @@ app.post('/adminLogin', async (req, res) => {
             .select('*')
             .eq('username', username)
             .single();
+        console.log('admin:', admin);
 
         if (error || !admin){
+            console.log('Admin not found or Supabase error:', error);
             return res.status(400).json({
                 message: 'Invalid username or password'
             });
