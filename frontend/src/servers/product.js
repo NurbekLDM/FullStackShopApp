@@ -2,19 +2,26 @@ import axios from 'axios';
 
 const API_URL = 'https://full-stack-shop-app.vercel.app';
 
-export const addProduct = async (productData) => {
+
+export const addProduct = async (formData) => {
     try {
-        const response = await axios.post(`${API_URL}/products`, productData);
+        const token = localStorage.getItem('admin-token');
+        const response = await axios.post(`${API_URL}/addProduct`, formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+                'Authorization': `Bearer ${token}`
+            }
+        });
         return response.data;
     } catch (error) {
-        console.error('Error adding product:', error);
+        // Error handling remains the same
         throw error;
     }
 };
 
 export const updateProduct = async (productId, productData) => {
     try {
-        const response = await axios.put(`${API_URL}/products/${productId}`, productData);
+        const response = await axios.put(`${API_URL}/updateProduct/${productId}`, productData);
         return response.data;
     } catch (error) {
         console.error('Error updating product:', error);
@@ -24,7 +31,7 @@ export const updateProduct = async (productId, productData) => {
 
 export const deleteProduct = async (productId) => {
     try {
-        const response = await axios.delete(`${API_URL}/products/${productId}`);
+        const response = await axios.delete(`${API_URL}/deleteProduct/${productId}`);
         return response.data;
     } catch (error) {
         console.error('Error deleting product:', error);
