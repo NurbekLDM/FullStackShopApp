@@ -219,25 +219,27 @@ app.get('/products/:id', async (req, res) => {
     }
 });
 
+const path = require('path');
+const fs = require('fs');
+
 app.post('/addProduct', upload.single('image'), async (req, res) => {
     try {
         const { name, description, price, stock, category, tag_name } = req.body;
 
-        // Rasm yuklanmagan bo‘lsa
         if (!req.file) {
             return res.status(400).json({ message: 'No image uploaded' });
         }
 
-        // Rasmni Base64 formatga o‘tkazish
-        const imageBase64 = req.file.buffer.toString('base64');
-        const imageData = `data:${req.file.mimetype};base64,${imageBase64}`;
+        // Rasmni serverga saqlash
+        const imagePath = `uploads/${Date.now()}-${req.file.originalname}`;
+        fs.writeFileSync(imagePath, req.file.buffer);
 
-        // Supabase`ga kiritish
+        // Supabase yoki bazaga faqat URLni saqlash
+        const imageURL = `https://full-stack-shop-app.vercel.app/${imagePath}`;
+
         const { data, error } = await supabase
             .from('products')
-            .insert([{ name, description, price, stock, category,
-                image_data: imageData, // Base64 string sifatida saqlash
-                tag_name }])
+            .insert([{ name, description, price, stock, category, image_data: imageURL, tag_name }])
             .select()
             .single();
 
@@ -252,6 +254,7 @@ app.post('/addProduct', upload.single('image'), async (req, res) => {
         res.status(500).json({ message: 'Internal Server Error' });
     }
 });
+
 
 
 // delete product
