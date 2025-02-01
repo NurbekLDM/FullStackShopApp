@@ -219,8 +219,8 @@ app.get('/products/:id', async (req, res) => {
     }
 });
 
-const path = require('path');
-const fs = require('fs');
+
+
 
 app.post('/addProduct', upload.single('image'), async (req, res) => {
     try {
@@ -230,30 +230,40 @@ app.post('/addProduct', upload.single('image'), async (req, res) => {
             return res.status(400).json({ message: 'No image uploaded' });
         }
 
-        // Rasmni serverga saqlash
-        const imagePath = `uploads/${Date.now()}-${req.file.originalname}`;
-        fs.writeFileSync(imagePath, req.file.buffer);
-
-        // Supabase yoki bazaga faqat URLni saqlash
-        const imageURL = `https://full-stack-shop-app.vercel.app/${imagePath}`;
-
-        const { data, error } = await supabase
-            .from('products')
-            .insert([{ name, description, price, stock, category, image_data: imageURL, tag_name }])
-            .select()
-            .single();
+        // Fayl nomi va buffer
+        const fileName = `${Date.now()}-${req.file.originalname}`;
+        const { data, error } = await supabase.storage
+            .from("products") // Storage bucket nomi
+            .upload(fileName, req.file.buffer, {
+                contentType: req.file.mimetype,
+            });
 
         if (error) {
-            console.log('Inserting error', error);
+            console.error("Error uploading image:", error);
+            return res.status(500).json({ message: "Image upload failed" });
+        }
+
+        // Rasm URL'sini olish
+        const imageURL = `https://your-supabase-url.storage.com/products/${fileName}`;
+
+        // Ma'lumotlar bazasiga saqlash
+        const { data: product, error: dbError } = await supabase
+            .from('products')
+            .insert([{ name, description, price, stock, category, image_data: imageURL, tag_name }])
+            .single();
+
+        if (dbError) {
+            console.log('Database insert error:', dbError);
             return res.status(500).json({ message: 'Error inserting product' });
         }
 
-        res.status(201).json(data);
+        res.status(201).json(product);
     } catch (error) {
         console.error('Server Error:', error);
         res.status(500).json({ message: 'Internal Server Error' });
     }
 });
+
 
 
 
