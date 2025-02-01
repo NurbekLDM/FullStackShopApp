@@ -234,7 +234,9 @@ app.post('/addProduct', upload.single('image'), async (req, res) => {
         // Insert into Supabase
         const { data, error } = await supabase
             .from('products')
-            .insert([{ name, description, price, stock, category, image_data, tag_name }])
+            .insert([{ name, description, price, stock, category, 
+                image_data: req.file ? req.file.buffer : null,
+                tag_name }])
             .single();
 
         if (error){
