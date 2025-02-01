@@ -221,10 +221,17 @@ app.get('/products/:id', async (req, res) => {
 
 // add product
 app.post('/addProduct', upload.single('image'), async (req, res) => {
-    try{
-        const {name , description , price , stock, category, tag_name} = req.body;
+    try {
+        // Extract fields from req.body (parsed by multer)
+        const { name, description, price, stock, category, tag_name } = req.body;
+        
+        // Check if file exists
+        if (!req.file) {
+            return res.status(400).json({ message: 'No image uploaded' });
+        }
         const image_data = req.file.buffer;
 
+        // Insert into Supabase
         const { data, error } = await supabase
             .from('products')
             .insert([{ name, description, price, stock, category, image_data, tag_name }])
@@ -233,10 +240,9 @@ app.post('/addProduct', upload.single('image'), async (req, res) => {
         if (error) throw error;
 
         res.status(201).json(data);
-    } catch (error){
-        res.status(500).json({
-            message: 'Internal Server Error'
-        });
+    } catch (error) {
+        console.error('Server Error:', error); // Log the error
+        res.status(500).json({ message: 'Internal Server Error' });
     }
 });
 
