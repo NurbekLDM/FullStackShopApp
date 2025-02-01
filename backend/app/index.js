@@ -686,42 +686,46 @@ app.get('/admin/:id', async (req, res) => {
     }
 })
 
-// admin login 
+// admin login
 app.post('/adminLogin', async (req, res) => {
-    try {
-      const { username, password } = req.body;
-  
-      // Check if username and password are provided
-      if (!username || !password) {
-        return res.status(400).json({ message: 'Username and password are required' });
-      }
-  
-      // Fetch admin from the database (example using Supabase)
-      const { data: admin, error } = await supabase
-        .from('admins')
-        .select('*')
-        .eq('username', username)
-        .single();
-  
-      if (error || !admin) {
-        return res.status(400).json({ message: 'Invalid username or password' });
-      }
-  
-      // Compare passwords (assuming passwords are hashed)
-      const isPasswordValid = await bcrypt.compare(password, admin.password);
-      if (!isPasswordValid) {
-        return res.status(400).json({ message: 'Invalid username or password' });
-      }
-  
-      // Generate a token (example using JWT)
-      const token = jwt.sign({ id: admin.id }, 'your-secret-key', { expiresIn: '1h' });
-  
-      res.status(200).json({ token });
-    } catch (error) {
-      console.error('Login error:', error);
-      res.status(500).json({ message: 'Internal Server Error' });
+    const { username, password } = req.body;
+
+    try{
+        const { data: admin, error } = await supabase
+            .from('admins')
+            .select('*')
+            .eq('username', username)
+            .single();
+
+        if (error || !admin){
+            return res.status(400).json({
+                message: 'Invalid username or password'
+            });
+        }
+
+        const isMatch = await bcrypt.compare(password, admin.password);
+        if (!isMatch){
+            return res.status(400).json({
+                message: 'Invalid username or password'
+            });
+        }
+
+        const token = jwt.sign(
+            {adminId: admin.id , username: admin.username},
+            'secret',
+            {expiresIn: '3h'}
+        );
+
+        res.json({
+            message: 'Admin logged in successfully',
+            token: token
+        });
+    } catch (error){
+        res.status(500).json({
+            message: 'Internal Server Error'
+        });
     }
-  });
+})
 
 // delete admin
 app.delete('/deleteAdmin/:id', async (req, res) => {
