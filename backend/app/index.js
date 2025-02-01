@@ -707,7 +707,7 @@ app.post('/adminLogin', async (req, res) => {
         const isMatch = await bcrypt.compare(password, admin.password);
         if (!isMatch){
             return res.status(400).json({
-                message: 'Invalid username or password'
+                message: 'Invalid  password'
             });
         }
 
