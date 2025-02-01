@@ -237,7 +237,10 @@ app.post('/addProduct', upload.single('image'), async (req, res) => {
             .insert([{ name, description, price, stock, category, image_data, tag_name }])
             .single();
 
-        if (error) throw error;
+        if (error){
+            console.log('Inserting error', error)
+            return res.status(500).json({ message: 'Error inserting product' });
+        }
 
         res.status(201).json(data);
     } catch (error) {
