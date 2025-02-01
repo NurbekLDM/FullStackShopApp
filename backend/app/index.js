@@ -219,37 +219,40 @@ app.get('/products/:id', async (req, res) => {
     }
 });
 
-// add product
 app.post('/addProduct', upload.single('image'), async (req, res) => {
     try {
-        // Extract fields from req.body (parsed by multer)
         const { name, description, price, stock, category, tag_name } = req.body;
-        
-        // Check if file exists
+
+        // Rasm yuklanmagan bo‘lsa
         if (!req.file) {
             return res.status(400).json({ message: 'No image uploaded' });
         }
-        const image_data = req.file.buffer;
 
-        // Insert into Supabase
+        // Rasmni Base64 formatga o‘tkazish
+        const imageBase64 = req.file.buffer.toString('base64');
+        const imageData = `data:${req.file.mimetype};base64,${imageBase64}`;
+
+        // Supabase`ga kiritish
         const { data, error } = await supabase
             .from('products')
-            .insert([{ name, description, price, stock, category, 
-                image_data: req.file ? req.file.buffer : null,
+            .insert([{ name, description, price, stock, category,
+                image_data: imageData, // Base64 string sifatida saqlash
                 tag_name }])
+            .select()
             .single();
 
-        if (error){
-            console.log('Inserting error', error)
+        if (error) {
+            console.log('Inserting error', error);
             return res.status(500).json({ message: 'Error inserting product' });
         }
 
         res.status(201).json(data);
     } catch (error) {
-        console.error('Server Error:', error); // Log the error
+        console.error('Server Error:', error);
         res.status(500).json({ message: 'Internal Server Error' });
     }
 });
+
 
 // delete product
 app.delete('/deleteProduct/:id', async (req, res) => {
