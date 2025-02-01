@@ -656,6 +656,7 @@ app.post('/addAdmin', async (req, res) => {
             .single();
 
         if (error) throw error;
+        
 
         res.status(201).json(data);
     } catch (error){
