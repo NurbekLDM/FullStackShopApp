@@ -1,13 +1,15 @@
 import React, { useEffect, useState } from "react";
-import { getAllProducts } from "../servers/product";
+import {getAllProducts, searchProducts} from "../servers/product";
 import { useNavigate } from "react-router-dom";
 
-export default function Products() {
+export default function Products({searchTerm}) {
   const navigate = useNavigate();
 
+  const [loading, setLoading] = useState(true);
   const [products, setProducts] = useState([]);
   const [isModelOpen, setIsModelOpen] = useState(false);
   const [isSortOpen, setIsSortOpen] = useState(false);
+  const [error, setError] = useState("");
 
   const handleFavourite = (product) => {
     const { id, name, price, image } = product;
@@ -56,16 +58,24 @@ export default function Products() {
 
   useEffect(() => {
     const fetchProducts = async () => {
+      if (!searchTerm) return;
+      setLoading(true);
       try {
-        const products = await getAllProducts();
+        const products = await searchProducts();
         setProducts(products);
       } catch (err) {
+        setError('Failed to fetch products')
         console.error("Error fetching products:", err);
+      } finally {
+        setLoading(false);
       }
     };
     fetchProducts();
   }, []);
 
+  if (loading) return <div>Loading...</div>;
+
+  if (error) return <p>{error}</p>
   return (
     <div>
 
@@ -234,6 +244,10 @@ export default function Products() {
           </div>
 
 
+
+            {products.length === 0 ? (
+              <p>No Product found</p>
+            ):(
           <div className="sm:flex gap-10">
            {products.map((product) => (
                     <div className="rounded-lg lg:w-1/4 md:w-1/2 sm:w-1/4 border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800">
@@ -470,9 +484,11 @@ export default function Products() {
                         </div>
                       </div>
                     </div>
-
            ))}
           </div>
+
+            )}
+
 
           <div className="w-full mt-10 text-center">
             <button
