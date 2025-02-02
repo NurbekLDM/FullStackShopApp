@@ -218,12 +218,12 @@ export default function ProductsPage(){
                                     <tr className="border-b dark:border-gray-700">
                                         <th scope="row"
                                             className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                                            <img src={`${API_URL}${product.image_data}`} alt="Product"/>
+                                            <img className="w-16 h-12" src={product.image_data} alt="Product"/>
                                         </th>
                                         <td className="px-4 py-3">{product.name}</td>
-                                        <td className="px-4 py-3">Apple</td>
-                                        <td className="px-4 py-3">300</td>
-                                        <td className="px-4 py-3">$2999</td>
+                                        <td className="px-4 py-3">{product.category}</td>
+                                        <td className="px-4 py-3">{product.stock}</td>
+                                        <td className="px-4 py-3">${product.price}</td>
                                         <td className="px-4 py-3 flex items-center justify-end">
                                             <button id="apple-imac-27-dropdown-button"
                                                     data-dropdown-toggle="apple-imac-27-dropdown"

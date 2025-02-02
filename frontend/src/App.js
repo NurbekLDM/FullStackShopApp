@@ -19,7 +19,8 @@ export default function App() {
   const adminToken = localStorage.getItem("admin-token");
 
   const routes = [
-    { path: "/", element: <HomePage /> },
+    { path: "/",
+      element: token? <HomePage /> : <Navigate to="/login" />},
     { path: "/register", element: <RegisterPage /> },
     { path: "/login", element: <LoginPage /> },
     { path: "/product", element: <ProductDetails /> },

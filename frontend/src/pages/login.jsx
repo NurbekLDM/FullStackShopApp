@@ -61,6 +61,8 @@ export default function LoginPage() {
                             required
                         />
                     </div>
+
+                    <a href='/register' className="text-red-700 text-sm mt-10">Do you have not an account?</a>
                     <button
                         type="submit"
                         className="w-full text-white bg-blue-600 hover:bg-blue-800 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
