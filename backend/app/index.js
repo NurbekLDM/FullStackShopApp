@@ -792,6 +792,28 @@ app.put('/updateAdmin/:id', async (req, res) => {
     }
 })
 
+app.get('/search', async (req, res) => {
+    const searchTerm = req.query.q;
+
+    try {
+        const { data, error } = await supabase
+            .from('products')
+            .select('*')
+            .ilike('name', `%${searchTerm}%`)  // Mahsulot nomida qidirish
+            .or(`category.ilike.%${searchTerm}%, description.ilike.%${searchTerm}% , tag_name.ilike.%${searchTerm}%`);  // Brend va tavsifda ham qidirish
+
+
+        if (error) throw error;
+
+        res.json(data);
+    } catch (error) {
+        res.status(500).json({
+            message: 'Internal Server Error'
+        });
+    }
+});
+
+
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
 });
