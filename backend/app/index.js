@@ -219,10 +219,6 @@ app.get('/products/:id', async (req, res) => {
     }
 });
 
-
-
-
-
 app.post('/addProduct', upload.single('image'), async (req, res) => {
     try {
         const { name, description, price, stock, category, tag_name } = req.body;
