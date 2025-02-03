@@ -5,6 +5,7 @@ export default function Navbar(){
     const [isUserDropdownOpen, setIsUserDropdownOpen] = React.useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
 
+    const token = localStorage.getItem("token");
     useEffect(() => {
         if (isUserDropdownOpen){
             setIsDropdownOpen(false);
@@ -13,6 +14,11 @@ export default function Navbar(){
             setIsUserDropdownOpen(false);
         }
     }, [isUserDropdownOpen , isDropdownOpen]);
+
+   const handleCLickLogout = () => {
+        localStorage.removeItem("token");
+        window.location.href = "/";
+    }
 
     useEffect(() => {
         const mobileMenuButton = document.querySelector('[data-collapse-toggle="ecommerce-navbar-menu-1"]');
@@ -311,37 +317,55 @@ export default function Navbar(){
                 </div>
 
                 {/*User dropdown*/}
+
                 <div id="userDropdown1"
                      className={` ${isUserDropdownOpen ? " " : "hidden"} z-10 absolute  w-56 divide-y divide-gray-100 overflow-hidden overflow-y-auto rounded-lg bg-white mt-4 shadow`}>
-                    <ul className="p-2 text-start  text-sm font-medium text-gray-900 ">
-                        <li><a href="#" title=""
-                               className="inline-flex md:text-sm w-full  items-center gap-2 rounded-md px-3 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-600"> My
-                            Account </a></li>
-                        <li><a href="/orders" title=""
-                               className="inline-flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-600"> My
-                            Orders </a></li>
-                        <li><a href="#" title=""
-                               className="inline-flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-600"> Settings </a>
-                        </li>
-                        <li><a href="/favourites" title=""
-                               className="inline-flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-600"> Favourites </a>
-                        </li>
-                        <li><a href="#" title=""
-                               className="inline-flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-600"> Delivery
-                            Addresses </a></li>
-                        <li><a href="#" title=""
-                               className="inline-flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-600"> Billing
-                            Data </a></li>
-                    </ul>
 
-                    <div className="p-2 text-sm font-medium text-gray-900 dark:text-white">
-                        <a href="#" title=""
-                           className="inline-flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-600"> Sign
-                            Out </a>
-                    </div>
+                    {token ?(
+                            <ul className="p-2 text-start  text-sm font-medium text-gray-900 ">
+                                <li><a href="#" title=""
+                                       className="inline-flex md:text-sm w-full  items-center gap-2 rounded-md px-3 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-600"> My
+                                    Account </a></li>
+                                <li><a href="/orders" title=""
+                                       className="inline-flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-600"> My
+                                    Orders </a></li>
+                                <li><a href="#" title=""
+                                       className="inline-flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-600"> Settings </a>
+                                </li>
+                                <li><a href="/favourites" title=""
+                                       className="inline-flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-600"> Favourites </a>
+                                </li>
+                                <li><a href="#" title=""
+                                       className="inline-flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-600"> Delivery
+                                    Addresses </a></li>
+                                <li><a href="#" title=""
+                                       className="inline-flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-600"> Billing
+                                    Data </a></li>
+                                <li>
+
+                                    <a href="" title=""
+                                       onClick={handleCLickLogout}
+                                       className="inline-flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-600"> Sign
+                                        Out </a>
+                                </li>
+                            </ul>
+
+
+                        )
+                        : (
+                            <ul className="p-2 text-start  text-sm font-medium text-gray-900 ">
+                            <li><a href="/login" title=""
+                                   className="inline-flex md:text-sm w-full  items-center gap-2 rounded-md px-3 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-600"> Login </a></li>
+                            <li><a href="/register" title=""
+                                   className="inline-flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-600"> Register </a></li>
+                        </ul>
+                        )}
+
+
+
                 </div>
 
-                </div>
+              </div>
 
                 {/*Mobile menu*/}
                 <div id="ecommerce-navbar-menu-1"

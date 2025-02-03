@@ -132,7 +132,7 @@ export const getAllPurchaseHistory = async () => {
 
 export const searchProducts = async (searchQuery) => {
     try {
-        const response = await axios.get(`${API_URL}/search/${searchQuery}`);
+        const response = await axios.get(`${API_URL}/search?q=${searchQuery}`);
         return response.data;
     } catch (error) {
         console.error('Error searching products:', error);

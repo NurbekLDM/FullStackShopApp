@@ -3,6 +3,7 @@ import React, {useEffect , useState} from 'react';
 
 export default function AdminPanelNavbar() {
 
+    const token = localStorage.getItem('token');
     const [isMobileMenu , setIsMobileMenu] = useState(false)
 
     useEffect(() => {

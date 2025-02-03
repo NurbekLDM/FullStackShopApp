@@ -1,263 +1,299 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState ,useRef } from "react";
 import {getAllProducts, searchProducts} from "../servers/product";
 import { useNavigate } from "react-router-dom";
 
 export default function Products({searchTerm}) {
   const navigate = useNavigate();
 
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const handleSearch = async (query) => {
+    setSearchQuery(query);
+    setLoading(true);
+    try {
+      const results = await searchProducts(query); // searchProducts API ni chaqiramiz
+      setProducts(results);
+    } catch (err) {
+      setError("Failed to fetch search results");
+      console.error("Error searching products:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+  const filterButtonRef = useRef(null);
+  const filterModalRef = useRef(null);
+  const closeButtonRef = useRef(null);
+  const sortDropdownButtonRef = useRef(null);
+
   const [loading, setLoading] = useState(true);
   const [products, setProducts] = useState([]);
-  const [isModelOpen, setIsModelOpen] = useState(false);
   const [isSortOpen, setIsSortOpen] = useState(false);
   const [error, setError] = useState("");
 
   const handleFavourite = (product) => {
     const { id, name, price, image } = product;
-    console.log("Product is", product)
     const productData = { id, name, price, image };
     const favourites = JSON.parse(localStorage.getItem("favourites")) || [];
     favourites.push(productData);
     localStorage.setItem("favourites", JSON.stringify(favourites));
-
     console.log("Favourite added", productData);
   };
 
-  useEffect(() => {
-    const button = document.getElementById("filterButton");
-    const modal = document.getElementById("filterModal");
-    const closeButton = document.getElementById("closeButton");
+  const handleProduct = (productId) => {
+    navigate(`/product/${productId}`);
+  }
 
-    button.addEventListener("click", () => {
-      modal.classList.remove("hidden");
-    });
-    closeButton.addEventListener("click", () => {
-      modal.classList.add("hidden");
-    });
+  // Handle filter button and modal
+  useEffect(() => {
+    const button = filterButtonRef.current;
+    const modal = filterModalRef.current;
+    const closeButton = closeButtonRef.current;
+
+    if (button && modal && closeButton) {
+      const handleFilterButtonClick = () => {
+        modal.classList.remove("hidden");
+      };
+      const handleCloseButtonClick = () => {
+        modal.classList.add("hidden");
+      };
+
+      button.addEventListener("click", handleFilterButtonClick);
+      closeButton.addEventListener("click", handleCloseButtonClick);
+
+      // Cleanup
+      return () => {
+        button.removeEventListener("click", handleFilterButtonClick);
+        closeButton.removeEventListener("click", handleCloseButtonClick);
+      };
+    }
   }, []);
 
+  // Handle sort dropdown button
   useEffect(() => {
-    const button = document.getElementById("sortDropdownButton1");
-    const handleClick = () => {
-      setIsSortOpen((prevState) => !prevState);
-    };
+    const button = sortDropdownButtonRef.current;
 
     if (button) {
-      button.addEventListener("click", handleClick);
+      const handleSortButtonClick = () => {
+        setIsSortOpen((prevState) => !prevState);
+      };
+
+      button.addEventListener("click", handleSortButtonClick);
+
+      // Cleanup
+      return () => {
+        button.removeEventListener("click", handleSortButtonClick);
+      };
     }
-
-    return () => {
-      if (button) {
-        button.removeEventListener("click", handleClick);
-      }
-    };
-  });
-
-  const handleClick = () => {
-    navigate(`/product`);
-  };
-
-  useEffect(() => {
-    const fetchProducts = async () => {
-      if (!searchTerm) return;
-      setLoading(true);
-      try {
-        const products = await searchProducts();
-        setProducts(products);
-      } catch (err) {
-        setError('Failed to fetch products')
-        console.error("Error fetching products:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchProducts();
   }, []);
 
-  if (loading) return <div>Loading...</div>;
+  // Fetch products
+  useEffect(() => {
+    if (searchTerm) {
+      const fetchSearchResults = async () => {
+        setLoading(true);
+        try {
+          const results = await searchProducts(searchTerm); // searchProducts API ni chaqiramiz
+          setProducts(results);
+        } catch (err) {
+          setError("Failed to fetch search results");
+          console.error("Error searching products:", err);
+        } finally {
+          setLoading(false);
+        }
+      };
+      fetchSearchResults();
+    } else {
+      // Agar qidiruv boʻsh boʻlsa, barcha mahsulotlarni koʻrsatamiz
+      const fetchAllProducts = async () => {
+        setLoading(true);
+        try {
+          const products = await getAllProducts();
+          setProducts(products);
+        } catch (err) {
+          setError("Failed to fetch products");
+          console.error("Error fetching products:", err);
+        } finally {
+          setLoading(false);
+        }
+      };
+      fetchAllProducts();
+    }
+  }, [searchTerm]); // searchTerm o'zgarganida useEffect qayta ishlaydi
 
-  if (error) return <p>{error}</p>
+
+  if (loading) return <div className="text-center">Loading...</div>;
+  if (error) return <p>{error}</p>;
+
   return (
-    <div>
-
-
-      <section className=" bg-gray-50 py-8 antialiased dark:bg-gray-900 md:py-12">
-        <div className="mx-auto max-w-screen-xl px-4 2xl:px-0">
-          <div className="mb-4 items-end justify-between space-y-4 sm:flex sm:space-y-0 md:mb-8">
-            <div>
-              <h2 className="mt-3 text-xl font-semibold text-gray-900 dark:text-white sm:text-2xl">
-                Products
-              </h2>
-            </div>
-            <div className="flex items-center space-x-4">
-              <button
-                id="filterButton"
-                data-modal-toggle="filterModal"
-                data-modal-target="filterModal"
-                type="button"
-                className="flex w-full items-center justify-center rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-900 hover:bg-gray-100 hover:text-primary-700 focus:z-10 focus:outline-none focus:ring-4 focus:ring-gray-100 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white dark:focus:ring-gray-700 sm:w-auto"
-              >
-                <svg
-                  className="-ms-0.5 me-2 h-4 w-4"
-                  aria-hidden="true"
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
-                  fill="none"
-                  viewBox="0 0 24 24"
+      <div>
+        <section className="bg-gray-50 py-8 antialiased dark:bg-gray-900 md:py-12">
+          <div className="mx-auto max-w-screen-xl px-4 2xl:px-0">
+            <div className="mb-4 items-end justify-between space-y-4 sm:flex sm:space-y-0 md:mb-8">
+              <div>
+                <h2 className="mt-3 text-xl font-semibold text-gray-900 dark:text-white sm:text-2xl">
+                  Products
+                </h2>
+              </div>
+              <div className="flex items-center space-x-4">
+                <button
+                    ref={filterButtonRef}
+                    type="button"
+                    className="flex w-full items-center justify-center rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-900 hover:bg-gray-100 hover:text-primary-700 focus:z-10 focus:outline-none focus:ring-4 focus:ring-gray-100 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white dark:focus:ring-gray-700 sm:w-auto"
                 >
-                  <path
-                    stroke="currentColor"
-                    strokeLinecap="round"
-                    strokeWidth="2"
-                    d="M18.796 4H5.204a1 1 0 0 0-.753 1.659l5.302 6.058a1 1 0 0 1 .247.659v4.874a.5.5 0 0 0 .2.4l3 2.25a.5.5 0 0 0 .8-.4v-7.124a1 1 0 0 1 .247-.659l5.302-6.059c.566-.646.106-1.658-.753-1.658Z"
-                  />
-                </svg>
-                Filters
-                <svg
-                  className="-me-0.5 ms-2 h-4 w-4"
-                  aria-hidden="true"
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
-                  fill="none"
-                  viewBox="0 0 24 24"
+                  <svg
+                      className="-ms-0.5 me-2 h-4 w-4"
+                      aria-hidden="true"
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                  >
+                    <path
+                        stroke="currentColor"
+                        strokeLinecap="round"
+                        strokeWidth="2"
+                        d="M18.796 4H5.204a1 1 0 0 0-.753 1.659l5.302 6.058a1 1 0 0 1 .247.659v4.874a.5.5 0 0 0 .2.4l3 2.25a.5.5 0 0 0 .8-.4v-7.124a1 1 0 0 1 .247-.659l5.302-6.059c.566-.646.106-1.658-.753-1.658Z"
+                    />
+                  </svg>
+                  Filters
+                  <svg
+                      className="-me-0.5 ms-2 h-4 w-4"
+                      aria-hidden="true"
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                  >
+                    <path
+                        stroke="currentColor"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="m19 9-7 7-7-7"
+                    />
+                  </svg>
+                </button>
+                <button
+                    ref={sortDropdownButtonRef}
+                    type="button"
+                    className="flex w-full items-center justify-center rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-900 hover:bg-gray-100 hover:text-primary-700 focus:z-10 focus:outline-none focus:ring-4 focus:ring-gray-100 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white dark:focus:ring-gray-700 sm:w-auto"
                 >
-                  <path
-                    stroke="currentColor"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="m19 9-7 7-7-7"
-                  />
-                </svg>
-              </button>
-              <button
-                id="sortDropdownButton1"
-                data-dropdown-toggle="dropdownSort1"
-                type="button"
-                className="flex w-full items-center justify-center rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-900 hover:bg-gray-100 hover:text-primary-700 focus:z-10 focus:outline-none focus:ring-4 focus:ring-gray-100 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white dark:focus:ring-gray-700 sm:w-auto"
-              >
-                <svg
-                  className="-ms-0.5 me-2 h-4 w-4"
-                  aria-hidden="true"
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
-                  fill="none"
-                  viewBox="0 0 24 24"
+                  <svg
+                      className="-ms-0.5 me-2 h-4 w-4"
+                      aria-hidden="true"
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                  >
+                    <path
+                        stroke="currentColor"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M7 4v16M7 4l3 3M7 4 4 7m9-3h6l-6 6h6m-6.5 10 3.5-7 3.5 7M14 18h4"
+                    />
+                  </svg>
+                  Sort
+                  <svg
+                      className="-me-0.5 ms-2 h-4 w-4"
+                      aria-hidden="true"
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                  >
+                    <path
+                        stroke="currentColor"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="m19 9-7 7-7-7"
+                    />
+                  </svg>
+                </button>
+                <div
+                    id="dropdownSort1"
+                    className={`${
+                        isSortOpen ? "" : "hidden"
+                    } z-10 absolute mt-72 w-40 divide-y divide-gray-100 rounded-lg bg-white shadow dark:bg-gray-700`}
                 >
-                  <path
-                    stroke="currentColor"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M7 4v16M7 4l3 3M7 4 4 7m9-3h6l-6 6h6m-6.5 10 3.5-7 3.5 7M14 18h4"
-                  />
-                </svg>
-                Sort
-                <svg
-                  className="-me-0.5 ms-2 h-4 w-4"
-                  aria-hidden="true"
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    stroke="currentColor"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="m19 9-7 7-7-7"
-                  />
-                </svg>
-              </button>
-              <div
-                id="dropdownSort1"
-                className={`${
-                  isSortOpen ? " " : "hidden"
-                } z-10 absolute mt-72 w-40 divide-y divide-gray-100 rounded-lg bg-white shadow dark:bg-gray-700`}
-                data-popper-placement="bottom"
-              >
-                <ul
-                  className="p-2 text-left text-sm font-medium text-gray-500 dark:text-gray-400"
-                  aria-labelledby="sortDropdownButton"
-                >
-                  <li>
-                    <a
-                      href="#"
-                      className="group inline-flex w-full items-center rounded-md px-3 py-2 text-sm text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-600 dark:hover:text-white"
-                    >
-                      {" "}
-                      The most popular{" "}
-                    </a>
-                  </li>
-                  <li>
-                    <a
-                      href="#"
-                      className="group inline-flex w-full items-center rounded-md px-3 py-2 text-sm text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-600 dark:hover:text-white"
-                    >
-                      {" "}
-                      Newest{" "}
-                    </a>
-                  </li>
-                  <li>
-                    <a
-                      href="#"
-                      className="group inline-flex w-full items-center rounded-md px-3 py-2 text-sm text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-600 dark:hover:text-white"
-                    >
-                      {" "}
-                      Increasing price{" "}
-                    </a>
-                  </li>
-                  <li>
-                    <a
-                      href="#"
-                      className="group inline-flex w-full items-center rounded-md px-3 py-2 text-sm text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-600 dark:hover:text-white"
-                    >
-                      {" "}
-                      Decreasing price{" "}
-                    </a>
-                  </li>
-                  <li>
-                    <a
-                      href="#"
-                      className="group inline-flex w-full items-center rounded-md px-3 py-2 text-sm text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-600 dark:hover:text-white"
-                    >
-                      {" "}
-                      No. reviews{" "}
-                    </a>
-                  </li>
-                  <li>
-                    <a
-                      href="#"
-                      className="group inline-flex w-full items-center rounded-md px-3 py-2 text-sm text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-600 dark:hover:text-white"
-                    >
-                      {" "}
-                      Discount %{" "}
-                    </a>
-                  </li>
-                </ul>
+                  <ul
+                      className="p-2 text-left text-sm font-medium text-gray-500 dark:text-gray-400"
+                      aria-labelledby="sortDropdownButton"
+                  >
+                    <li>
+                      <a
+                          href="#"
+                          className="group inline-flex w-full items-center rounded-md px-3 py-2 text-sm text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-600 dark:hover:text-white"
+                      >
+                        The most popular
+                      </a>
+                    </li>
+                    <li>
+                      <a
+                          href="#"
+                          className="group inline-flex w-full items-center rounded-md px-3 py-2 text-sm text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-600 dark:hover:text-white"
+                      >
+                        Newest
+                      </a>
+                    </li>
+                    <li>
+                      <a
+                          href="#"
+                          className="group inline-flex w-full items-center rounded-md px-3 py-2 text-sm text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-600 dark:hover:text-white"
+                      >
+                        Increasing price
+                      </a>
+                    </li>
+                    <li>
+                      <a
+                          href="#"
+                          className="group inline-flex w-full items-center rounded-md px-3 py-2 text-sm text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-600 dark:hover:text-white"
+                      >
+                        Decreasing price
+                      </a>
+                    </li>
+                    <li>
+                      <a
+                          href="#"
+                          className="group inline-flex w-full items-center rounded-md px-3 py-2 text-sm text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-600 dark:hover:text-white"
+                      >
+                        No. reviews
+                      </a>
+                    </li>
+                    <li>
+                      <a
+                          href="#"
+                          className="group inline-flex w-full items-center rounded-md px-3 py-2 text-sm text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-600 dark:hover:text-white"
+                      >
+                        Discount %
+                      </a>
+                    </li>
+                  </ul>
+                </div>
               </div>
             </div>
-          </div>
 
+          {/*Get products from API*/}
 
-
-            {products.length === 0 ? (
-              <p>No Product found</p>
-            ):(
           <div className="sm:flex gap-10">
            {products.map((product) => (
                     <div className="rounded-lg lg:w-1/4 md:w-1/2 sm:w-1/4 border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800">
                       <div className="h-56 w-full">
-                        <a href="/product">
+                        <a href="#" onClick={(e) => {
+                          e.preventDefault();
+                          handleProduct(product.id);
+                        }}>
                           <img
                               name="image"
-                            className="mx-auto h-full dark:hidden"
-                            src={product.image_data}
-                            alt=""
+                              className="mx-auto h-full dark:hidden"
+                              src={product.image_data}
+                              alt=""
                           />
                         </a>
                       </div>
@@ -484,11 +520,9 @@ export default function Products({searchTerm}) {
                         </div>
                       </div>
                     </div>
+
            ))}
           </div>
-
-            )}
-
 
           <div className="w-full mt-10 text-center">
             <button
