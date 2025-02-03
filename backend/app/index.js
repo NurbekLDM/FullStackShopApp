@@ -799,7 +799,7 @@ app.get('/search', async (req, res) => {
         const { data, error } = await supabase
             .from('products')
             .select('*')
-            .ilike('name', `%${searchTerm}%`)  // Mahsulot nomida qidirish
+            .ilike('name', `%${searchTerm}%`)
             .or(`category.ilike.%${searchTerm}%, description.ilike.%${searchTerm}% , tag_name.ilike.%${searchTerm}%`);  // Brend va tavsifda ham qidirish
 
 
