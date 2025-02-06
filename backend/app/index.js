@@ -66,6 +66,27 @@ app.post('/register', async (req, res) => {
     }
 });
 
+const ACCESS_TOKEN_SECRET = 'accesstokensecret';
+const REFRESH_TOKEN_SECRET = 'refreshtokensecret';
+
+let refreshTokens = [];
+
+function generateAccessToken(user) {
+    return jwt.sign(user, ACCESS_TOKEN_SECRET, {expiresIn: '3h'});
+}
+
+app.post('token', (req, res) => {
+    const refreshToken = req.body.token;
+    if (refreshToken == null) return res.sendStatus(401);
+    if (!refreshTokens.includes(refreshToken)) return res.sendStatus(403);
+
+    jwt.verify(refreshToken, REFRESH_TOKEN_SECRET, (err, user) => {
+        if (err) return res.sendStatus(403);
+        const accessToken = generateAccessToken({ userId: user.userId, username: user.username });
+        res.json({ accessToken });
+    })
+});
+
 // user login and create jwt token for user and expired in 3 hours
 app.post('/login', async (req, res) => {
     const {username, password} = req.body;
@@ -90,21 +111,26 @@ app.post('/login', async (req, res) => {
             });
         }
 
-        const token = jwt.sign(
-            {userId: user.id , username: user.username},
-            'secret',
-            {expiresIn: '3h'}
-        );
+        const accessToken = generateAccessToken({userId: user.id, username: user.username});
+        const refreshToken = jwt.sign({userId: user.id, username: user.username}, REFRESH_TOKEN_SECRET);
 
-        res.json({
-            message: 'User logged in successfully',
-            token: token
+        refreshTokens.push(refreshToken);
+        res.status(200).json({
+            message: 'Login successful',
+            accessToken,
+            refreshToken
         });
+
     } catch (error){
         res.status(500).json({
             message: 'Internal Server Error'
         });
     }
+});
+
+app.post('/logout', (req, res) => {
+    refreshTokens = refreshTokens.filter(token => token !== req.body.token);
+    res.sendStatus(204);
 });
 
 // Edit user information
