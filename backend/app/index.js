@@ -315,12 +315,42 @@ app.delete('/deleteProduct/:id', async (req, res) => {
 // edit product 
 app.put('/updateProduct/:id', upload.single('image'), async (req, res) => {
     const id = req.params.id;
-    const {name, description, price, stock, category, tag_name} = req.body;
-    const image_data = req.file ? req.file.buffer : null;
+    const { name, description, price, stock, category, tag_name } = req.body;
+    const file = req.file;
 
-    try{
-        const updateFields = { name, description, price, stock, category , tag_name };
-        if (image_data) updateFields.image_data = image_data;
+    try {
+        let imageUrl = null;
+
+        // Fayl yuklanganligini va formatini tekshirish
+        if (file) {
+            const allowedMimeTypes = ['image/jpeg', 'image/png', 'image/gif'];
+            if (!allowedMimeTypes.includes(file.mimetype)) {
+                return res.status(400).json({
+                    message: 'Invalid file type. Only JPEG, PNG, and GIF are allowed.',
+                });
+            }
+
+            const filePath = `products/${id}/${file.originalname}`;
+            const { data: uploadData, error: uploadError } = await supabase
+                .storage
+                .from('product-images')
+                .upload(filePath, file.buffer, {
+                    contentType: file.mimetype,
+                });
+
+            if (uploadError) throw uploadError;
+
+            const { data: urlData } = supabase
+                .storage
+                .from('product-images')
+                .getPublicUrl(filePath);
+
+            imageUrl = urlData.publicUrl;
+        }
+
+        // Productni yangilash
+        const updateFields = { name, description, price, stock, category, tag_name };
+        if (imageUrl) updateFields.image_data = imageUrl;
 
         const { data, error } = await supabase
             .from('products')
@@ -331,9 +361,10 @@ app.put('/updateProduct/:id', upload.single('image'), async (req, res) => {
         if (error) throw error;
 
         res.json(data);
-    } catch (error){
+    } catch (error) {
+        console.error('Error updating product:', error);
         res.status(500).json({
-            message: 'Internal Server Error'
+            message: 'Internal Server Error',
         });
     }
 });
