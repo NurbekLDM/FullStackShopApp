@@ -312,7 +312,8 @@ app.delete('/deleteProduct/:id', async (req, res) => {
     }
 });
 
-// edit product 
+
+// update product
 app.put('/updateProduct/:id', upload.single('image'), async (req, res) => {
     const id = req.params.id;
     const { name, description, price, stock, category, tag_name } = req.body;
@@ -321,7 +322,7 @@ app.put('/updateProduct/:id', upload.single('image'), async (req, res) => {
     try {
         let imageUrl = null;
 
-        // Fayl yuklanganligini va formatini tekshirish
+        // Check if a file is uploaded and its format
         if (file) {
             const allowedMimeTypes = ['image/jpeg', 'image/png', 'image/gif'];
             if (!allowedMimeTypes.includes(file.mimetype)) {
@@ -330,7 +331,7 @@ app.put('/updateProduct/:id', upload.single('image'), async (req, res) => {
                 });
             }
 
-            const filePath = `products/${id}/${file.originalname}`;
+            const filePath = `products/${id}/${Date.now()}-${file.originalname.replace(/[{}<>]/g, '')}`;
             const { data: uploadData, error: uploadError } = await supabase
                 .storage
                 .from('product-images')
@@ -348,7 +349,7 @@ app.put('/updateProduct/:id', upload.single('image'), async (req, res) => {
             imageUrl = urlData.publicUrl;
         }
 
-        // Productni yangilash
+        // Update the product
         const updateFields = { name, description, price, stock, category, tag_name };
         if (imageUrl) updateFields.image_data = imageUrl;
 
@@ -368,6 +369,7 @@ app.put('/updateProduct/:id', upload.single('image'), async (req, res) => {
         });
     }
 });
+
 
 // get all products
 app.get('/products', async (req, res) => {
