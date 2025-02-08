@@ -334,7 +334,7 @@ app.put('/updateProduct/:id', upload.single('image'), async (req, res) => {
             const filePath = `products/${id}/${Date.now()}-${file.originalname.replace(/[{}<>]/g, '')}`;
             const { data: uploadData, error: uploadError } = await supabase
                 .storage
-                .from('product-images')
+                .from('images')
                 .upload(filePath, file.buffer, {
                     contentType: file.mimetype,
                 });
