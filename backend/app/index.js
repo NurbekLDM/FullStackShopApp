@@ -416,7 +416,6 @@ app.put('/updateProduct/:id', upload.single('image'), async (req, res) => {
 });
 
 
-
 // get all products
 app.get('/products', async (req, res) => {
     try{
