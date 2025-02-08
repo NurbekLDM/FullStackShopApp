@@ -15,7 +15,7 @@ import ProductsPage from "./pages/adminPanel/components/products";
 import AdminLoginPage from "./pages/adminPanel/login";
 
 export default function App() {
-  const token = localStorage.getItem("token");
+  const token = localStorage.getItem("accessToken");
   const adminToken = localStorage.getItem("admin-token");
 
   const routes = [

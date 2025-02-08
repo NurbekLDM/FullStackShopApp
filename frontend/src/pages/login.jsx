@@ -1,7 +1,6 @@
-import React, {useState} from 'react';
-import { useNavigate} from 'react-router-dom';
-import {loginUser , getAllUsers} from '../servers/user';
-
+import React, { useState } from 'react';
+import { useNavigate , Link } from 'react-router-dom';
+import { loginUser } from '../servers/user';
 
 export default function LoginPage() {
     const [username, setUsername] = useState("");
@@ -9,33 +8,35 @@ export default function LoginPage() {
     const navigate = useNavigate();
     const [error, setError] = useState("");
 
-    const handleLogin = async (e)=>{
+    const handleLogin = async (e) => {
         e.preventDefault();
-        try{
-            const response = await loginUser({username, password});
+        try {
+            const response = await loginUser({ username, password });
+            const { accessToken, refreshToken } = response;
+            if (accessToken && refreshToken) {
+                localStorage.setItem("accessToken", accessToken);
+                localStorage.setItem("refreshToken", refreshToken);
                 navigate("/");
-                const {token} = response;
-                localStorage.setItem("token", token);
-                console.log(response);
-
-        } catch(err){
+            } else {
+                setError("Login failed, please try again.");
+            }
+        } catch (err) {
             setError("Invalid username or password");
         }
-
     };
 
     return (
         <div className="h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
-            <div
-                className="w-full max-w-md bg-white rounded-lg shadow dark:border dark:bg-gray-800 dark:border-gray-700 p-6 space-y-4 md:space-y-6 sm:p-8">
+            <div className="w-full max-w-md bg-white rounded-lg shadow dark:border dark:bg-gray-800 dark:border-gray-700 p-6 space-y-4 md:space-y-6 sm:p-8">
                 <h1 className="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
                     Login to your account
                 </h1>
                 {error && <p className="text-red-500">{error}</p>}
                 <form className="space-y-4 md:space-y-6" onSubmit={handleLogin}>
                     <div>
-                        <label htmlFor="username"
-                               className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Username</label>
+                        <label htmlFor="username" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                            Username
+                        </label>
                         <input
                             type="text"
                             name="username"
@@ -48,8 +49,9 @@ export default function LoginPage() {
                         />
                     </div>
                     <div>
-                        <label htmlFor="password"
-                               className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Password</label>
+                        <label htmlFor="password" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                            Password
+                        </label>
                         <input
                             type="password"
                             name="password"
@@ -61,8 +63,9 @@ export default function LoginPage() {
                             required
                         />
                     </div>
-
-                    <a href='/register' className="text-red-700 text-sm mt-10">Do you have not an account?</a>
+                    <Link to="/register" className="text-red-700 text-sm mt-10">
+                        Do you have not an account?
+                    </Link>
                     <button
                         type="submit"
                         className="w-full text-white bg-blue-600 hover:bg-blue-800 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
@@ -72,7 +75,5 @@ export default function LoginPage() {
                 </form>
             </div>
         </div>
-    )
-
-
+    );
 }

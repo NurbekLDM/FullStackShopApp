@@ -1,7 +1,6 @@
-import axios from 'axios'
+import axios from 'axios';
 
 const API_URL = 'https://full-stack-shop-app.vercel.app';
-
 
 export const registerUser = async (userData) => {
     try {
@@ -49,6 +48,26 @@ export const getAllUsers = async () => {
         return response.data;
     } catch (error) {
         console.error('Error fetching users:', error);
+        throw error;
+    }
+};
+
+export const logoutUser = async (token) => {
+    try {
+        const response = await axios.post(`${API_URL}/logout`, { token });
+        return response.data;
+    } catch (error) {
+        console.error('Error logging out:', error);
+        throw error;
+    }
+};
+
+export const getNewAccessToken = async (refreshToken) => {
+    try {
+        const response = await axios.post(`${API_URL}/token`, { token: refreshToken });
+        return response.data;
+    } catch (error) {
+        console.error('Error getting new access token:', error);
         throw error;
     }
 };

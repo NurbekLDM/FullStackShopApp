@@ -5,30 +5,17 @@ export default function Categories() {
   const [categories, setCategories] = useState([]);
   const [isCLicked, setIsClicked] = useState(false);
 
-  useEffect(() => {
-    const button = document.getElementById("categoryButton");
-    const handleClick = () => {
-      setIsClicked((prevState) => !prevState);
-    };
-
-    if (button) {
-      button.addEventListener("click", handleClick);
-    }
-
-    return () => {
-      if (button) {
-        button.removeEventListener("click", handleClick);
-      }
-    };
-  }, []);
+  const handleClick = () => {
+    setIsClicked((prevState) => !prevState);
+  };
 
   return (
     <section className="bg-gray-50 py-8 antialiased dark:bg-gray-900 md:py-16">
       <div className="mx-auto max-w-screen-xl px-4 2xl:px-0">
         <button
+            onClick={handleClick}
           id="categoryButton"
-          className="w-fit gap-4 mb-4 flex items-center md:mb-8"
-        >
+          className="w-fit gap-4 mb-4 flex items-center md:mb-8">
           <h2 className="text-xl font-semibold text-gray-900 dark:text-white sm:text-2xl">
             Shop by category
           </h2>

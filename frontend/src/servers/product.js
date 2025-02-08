@@ -21,7 +21,13 @@ export const addProduct = async (formData) => {
 
 export const updateProduct = async (productId, productData) => {
     try {
-        const response = await axios.put(`${API_URL}/updateProduct/${productId}`, productData);
+        const token = localStorage.getItem('admin-token');
+        const response = await axios.put(`${API_URL}/updateProduct/${productId}`, productData, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+                'Authorization': `Bearer ${token}`
+            },
+        });
         return response.data;
     } catch (error) {
         console.error('Error updating product:', error);

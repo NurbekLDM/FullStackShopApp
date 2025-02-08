@@ -1,7 +1,6 @@
-import React, {useState} from 'react';
-import { useNavigate} from 'react-router-dom';
-import {loginAdmin} from "../../servers/admin";
-
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { loginAdmin } from "../../servers/admin";
 
 export default function AdminLoginPage() {
     const [username, setUsername] = useState("");
@@ -9,19 +8,21 @@ export default function AdminLoginPage() {
     const navigate = useNavigate();
     const [error, setError] = useState("");
 
-
-    const handleLogin = async (e)=>{
+    const handleLogin = async (e) => {
         e.preventDefault();
         console.log('Username:', username, 'Password:', password);
 
-        try{
-            const response = await loginAdmin({username, password});
-            navigate("/adminPanel");
-            const {token} = response;
-            localStorage.setItem("admin-token", token);
-            console.log(response);
-
-        } catch(err){
+        try {
+            const response = await loginAdmin({ username, password });
+            const { token } = response;
+            if (token) {
+                localStorage.setItem("admin-token", token);
+                console.log(response);
+                window.location.href = "/adminPanel";
+            } else {
+                setError('Login failed, please try again.');
+            }
+        } catch (err) {
             if (err.response) {
                 console.error('Error Response:', err.response.data); // More detailed error message
                 setError('Invalid username or password');
@@ -29,21 +30,20 @@ export default function AdminLoginPage() {
                 console.error('Error:', err.message); // Handle network errors or other types of errors
             }
         }
-
     };
 
     return (
         <div className="h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
-            <div
-                className="w-full max-w-md bg-white rounded-lg shadow dark:border dark:bg-gray-800 dark:border-gray-700 p-6 space-y-4 md:space-y-6 sm:p-8">
+            <div className="w-full max-w-md bg-white rounded-lg shadow dark:border dark:bg-gray-800 dark:border-gray-700 p-6 space-y-4 md:space-y-6 sm:p-8">
                 <h1 className="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
                     Login to your account
                 </h1>
                 {error && <p className="text-red-500">{error}</p>}
                 <form className="space-y-4 md:space-y-6" onSubmit={handleLogin}>
                     <div>
-                        <label htmlFor="username"
-                               className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Username</label>
+                        <label htmlFor="username" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                            Username
+                        </label>
                         <input
                             type="text"
                             name="username"
@@ -56,8 +56,9 @@ export default function AdminLoginPage() {
                         />
                     </div>
                     <div>
-                        <label htmlFor="password"
-                               className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Password</label>
+                        <label htmlFor="password" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                            Password
+                        </label>
                         <input
                             type="password"
                             name="password"
@@ -78,7 +79,5 @@ export default function AdminLoginPage() {
                 </form>
             </div>
         </div>
-    )
-
-
+    );
 }

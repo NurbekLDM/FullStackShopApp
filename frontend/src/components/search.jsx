@@ -9,7 +9,7 @@ const Search = ({ onSearch }) => {
     };
 
     return (
-        <div>
+        <div className="sm:ml-16">
             <form onSubmit={handleSubmit} className="bg-gray-50 max-w-md mx-auto">
                 <label htmlFor="default-search" className="mb-2 text-sm font-medium text-gray-900 sr-only dark:text-white">
                     Search

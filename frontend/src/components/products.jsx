@@ -24,19 +24,102 @@ export default function Products({searchTerm}) {
   const filterModalRef = useRef(null);
   const closeButtonRef = useRef(null);
   const sortDropdownButtonRef = useRef(null);
-
   const [loading, setLoading] = useState(true);
   const [products, setProducts] = useState([]);
   const [isSortOpen, setIsSortOpen] = useState(false);
   const [error, setError] = useState("");
+  const [cart, setCart] = useState([]);
+  const [favourites, setFavourites] = useState([]);
 
+  // Fetch cart and favourites from localStorage
+  useEffect(() => {
+    const savedCart = JSON.parse(localStorage.getItem("cart")) || [];
+    const savedFavourites = JSON.parse(localStorage.getItem("favourites")) || [];
+    setCart(savedCart);
+    setFavourites(savedFavourites);
+  }, []);
+
+  // Handle quantity change
+  const handleQuantity = (productId, action) => {
+    const newCart = cart.map(item => {
+      if (item.id === productId) {
+        const newQuantity = action === 'increment'
+            ? item.quantity + 1
+            : item.quantity - 1;
+
+        return { ...item, quantity: newQuantity };
+      }
+      return item;
+    }).filter(item => item.quantity > 0); // 0 bo'lsa olib tashlaymiz
+
+    setCart(newCart);
+    localStorage.setItem("cart", JSON.stringify(newCart));
+  };
+
+  // Savatga qo'shish
+  const handleAddToCart = (product) => {
+    const existingItem = cart.find(item => item.id === product.id);
+    let newCart;
+
+    if (existingItem) {
+      newCart = cart.map(item =>
+          item.id === product.id
+              ? { ...item, quantity: item.quantity + 1 }
+              : item
+      );
+    } else {
+      newCart = [...cart, {
+        id: product.id,
+        name: product.name,
+        price: product.price,
+        quantity: 1
+      }]; // To'liq obyekt strukturi
+    }
+
+    localStorage.setItem("cart", JSON.stringify(newCart)); // JSON formatida saqlash
+    setCart(newCart);
+  };
+
+  // Product card ichidagi miqdor kontrolleri
+  const renderQuantityControls = (productId) => {
+    const cartItem = cart.find(item => item.id === productId);
+    return (
+        <div className="flex items-center gap-2">
+          <button
+              onClick={() => handleQuantity(productId, 'decrement')}
+              className="px-2 py-1 bg-gray-200 rounded"
+          >
+            -
+          </button>
+          <span>{cartItem?.quantity || 0}</span>
+          <button
+              onClick={() => handleQuantity(productId, 'increment')}
+              className="px-2 py-1 bg-gray-200 rounded"
+          >
+            +
+          </button>
+        </div>
+    );
+  };
+
+  // Favorite toggle
   const handleFavourite = (product) => {
-    const { id, name, price, image } = product;
-    const productData = { id, name, price, image };
-    const favourites = JSON.parse(localStorage.getItem("favourites")) || [];
-    favourites.push(productData);
-    localStorage.setItem("favourites", JSON.stringify(favourites));
-    console.log("Favourite added", productData);
+    const isFavorited = favourites.some(item => item.id === product.id);
+    let newFavourites;
+
+    if (isFavorited) {
+      newFavourites = favourites.filter(item => item.id !== product.id);
+    } else {
+      newFavourites = [...favourites, product];
+    }
+
+    setFavourites(newFavourites);
+    localStorage.setItem("favourites", JSON.stringify(newFavourites));
+  };
+
+  // Favorite holatini tekshirish
+  const isFavorited = (productId) => {
+    return favourites.some(item => item.id === productId);
   };
 
   const handleProduct = (productId) => {
@@ -44,47 +127,20 @@ export default function Products({searchTerm}) {
   }
 
   // Handle filter button and modal
-  useEffect(() => {
-    const button = filterButtonRef.current;
-    const modal = filterModalRef.current;
-    const closeButton = closeButtonRef.current;
-
-    if (button && modal && closeButton) {
-      const handleFilterButtonClick = () => {
-        modal.classList.remove("hidden");
-      };
-      const handleCloseButtonClick = () => {
-        modal.classList.add("hidden");
-      };
-
-      button.addEventListener("click", handleFilterButtonClick);
-      closeButton.addEventListener("click", handleCloseButtonClick);
-
-      // Cleanup
-      return () => {
-        button.removeEventListener("click", handleFilterButtonClick);
-        closeButton.removeEventListener("click", handleCloseButtonClick);
-      };
+  const toggleFilterModal = (show) => {
+    if (filterModalRef.current) {
+      filterModalRef.current.classList.toggle("hidden", !show);
     }
-  }, []);
+  };
 
-  // Handle sort dropdown button
-  useEffect(() => {
-    const button = sortDropdownButtonRef.current;
+  // Toggle sort dropdown
+  const toggleSortDropdown = () => {
+    setIsSortOpen(!isSortOpen);
+  };
 
-    if (button) {
-      const handleSortButtonClick = () => {
-        setIsSortOpen((prevState) => !prevState);
-      };
 
-      button.addEventListener("click", handleSortButtonClick);
 
-      // Cleanup
-      return () => {
-        button.removeEventListener("click", handleSortButtonClick);
-      };
-    }
-  }, []);
+
 
   // Fetch products
   useEffect(() => {
@@ -121,8 +177,9 @@ export default function Products({searchTerm}) {
   }, [searchTerm]); // searchTerm o'zgarganida useEffect qayta ishlaydi
 
 
-  if (loading) return <div className="text-center">Loading...</div>;
+  if (loading) return <div className="text-center text-gray-500 mb-20">Loading...</div>;
   if (error) return <p>{error}</p>;
+  if (products.length === 0) return <p className="text-center text-gray-500 mb-20">No products found</p>;
 
   return (
       <div>
@@ -136,7 +193,7 @@ export default function Products({searchTerm}) {
               </div>
               <div className="flex items-center space-x-4">
                 <button
-                    ref={filterButtonRef}
+                    onClick={() => toggleFilterModal(true)}
                     type="button"
                     className="flex w-full items-center justify-center rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-900 hover:bg-gray-100 hover:text-primary-700 focus:z-10 focus:outline-none focus:ring-4 focus:ring-gray-100 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white dark:focus:ring-gray-700 sm:w-auto"
                 >
@@ -176,7 +233,7 @@ export default function Products({searchTerm}) {
                   </svg>
                 </button>
                 <button
-                    ref={sortDropdownButtonRef}
+                    onClick={toggleSortDropdown}
                     type="button"
                     className="flex w-full items-center justify-center rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-900 hover:bg-gray-100 hover:text-primary-700 focus:z-10 focus:outline-none focus:ring-4 focus:ring-gray-100 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white dark:focus:ring-gray-700 sm:w-auto"
                 >
@@ -281,6 +338,7 @@ export default function Products({searchTerm}) {
 
           {/*Get products from API*/}
 
+
           <div className="sm:flex gap-10">
            {products.map((product) => (
                     <div className="rounded-lg lg:w-1/4 md:w-1/2 sm:w-1/4 border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800">
@@ -349,12 +407,15 @@ export default function Products({searchTerm}) {
                             >
                               <span className="sr-only"> Add to Favorites </span>
                               <svg
-                                  onClick={handleFavourite}
-                                className="h-5 w-5"
-                                aria-hidden="true"
-                                xmlns="http://www.w3.org/2000/svg"
-                                fill="none"
-                                viewBox="0 0 24 24"
+                                  onClick={() => handleFavourite(product)}
+                                  className={`h-6 w-6 ${
+                                      isFavorited(product.id)
+                                          ? "text-red-500 fill-current"
+                                          : "text-gray-500"
+                                  }`}
+                                  fill={isFavorited(product.id) ? "currentColor" : "none"}
+                                  stroke="currentColor"
+                                  viewBox="0 0 24 24"
                               >
                                 <path
                                   stroke="currentColor"
@@ -494,29 +555,35 @@ export default function Products({searchTerm}) {
                             ${product.price}
                           </p>
 
-                          <button
-                            type="button"
-                            className="inline-flex items-center rounded-lg bg-primary-700 px-5 py-2.5 text-sm font-medium text-white hover:bg-primary-800 focus:outline-none focus:ring-4  focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
-                          >
-                            <svg
-                              className="-ms-2 me-2 h-5 w-5"
-                              aria-hidden="true"
-                              xmlns="http://www.w3.org/2000/svg"
-                              width="24"
-                              height="24"
-                              fill="none"
-                              viewBox="0 0 24 24"
-                            >
-                              <path
-                                stroke="currentColor"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth="2"
-                                d="M4 4h1.5L8 16m0 0h8m-8 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm8 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm.75-3H7.5M11 7H6.312M17 4v6m-3-3h6"
-                              />
-                            </svg>
-                            Add to cart
-                          </button>
+                          {cart.some(item => item.id === product.id) ? (
+                              renderQuantityControls(product.id)
+                          ) : (
+                              <button
+                                  onClick={() => handleAddToCart(product)}
+                                  type="button"
+                                  className="inline-flex items-center rounded-lg bg-primary-700 px-5 py-2.5 text-sm font-medium text-white hover:bg-primary-800 focus:outline-none focus:ring-4  focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">
+                                <svg
+                                    className="-ms-2 me-2 h-5 w-5"
+                                    aria-hidden="true"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    width="24"
+                                    height="24"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                >
+                                  <path
+                                      stroke="currentColor"
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                      strokeWidth="2"
+                                      d="M4 4h1.5L8 16m0 0h8m-8 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm8 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm.75-3H7.5M11 7H6.312M17 4v6m-3-3h6"
+                                  />
+                                </svg>
+                                Add to cart
+                              </button>
+                          )}
+
+
                         </div>
                       </div>
                     </div>
@@ -524,34 +591,36 @@ export default function Products({searchTerm}) {
            ))}
           </div>
 
-          <div className="w-full mt-10 text-center">
-            <button
-              type="button"
-              className="rounded-lg border border-gray-200 bg-white px-5 py-2.5 text-sm font-medium text-gray-900 hover:bg-gray-100 hover:text-primary-700 focus:z-10 focus:outline-none focus:ring-4 focus:ring-gray-100 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white dark:focus:ring-gray-700"
-            >
-              Show more
-            </button>
+            <div className="w-full mt-10 text-center">
+              <button
+                  type="button"
+                  className="rounded-lg border border-gray-200 bg-white px-5 py-2.5 text-sm font-medium text-gray-900 hover:bg-gray-100 hover:text-primary-700 focus:z-10 focus:outline-none focus:ring-4 focus:ring-gray-100 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white dark:focus:ring-gray-700"
+              >
+                Show more
+              </button>
+            </div>
+
           </div>
 
-        </div>
-
-        <form
-          action="#"
-          method="get"
-          id="filterModal"
-          tabIndex="-1"
-          aria-hidden="true"
-          className="fixed left-0 right-0 top-0 z-50 hidden h-modal w-full overflow-y-auto overflow-x-hidden p-4 md:inset-0 md:h-full"
-        >
-          <div className="relative h-full w-full max-w-xl md:h-auto">
-            <div className="relative rounded-lg bg-white shadow dark:bg-gray-800">
-              <div className="flex items-start justify-between rounded-t p-4 md:p-5">
-                <h3 className="text-lg font-normal text-gray-500 dark:text-gray-400">
-                  Filters
-                </h3>
-                <button
-                  id="closeButton"
+          <form
+              ref={filterModalRef}
+              action="#"
+              method="get"
+              id="filterModal"
+              tabIndex="-1"
+              aria-hidden="true"
+              className="fixed left-0 right-0 top-0 z-50 hidden h-modal w-full overflow-y-auto overflow-x-hidden p-4 md:inset-0 md:h-full"
+          >
+            <div className="relative h-full w-full max-w-xl md:h-auto">
+              <div className="relative rounded-lg bg-white shadow dark:bg-gray-800">
+                <div className="flex items-start justify-between rounded-t p-4 md:p-5">
+                  <h3 className="text-lg font-normal text-gray-500 dark:text-gray-400">
+                    Filters
+                  </h3>
+                  <button
+                      id="closeButton"
                   type="button"
+                  onClick={() => toggleFilterModal(false)}
                   className="ml-auto inline-flex items-center rounded-lg bg-transparent p-1.5 text-sm text-gray-400 hover:bg-gray-100 hover:text-gray-900 dark:hover:bg-gray-600 dark:hover:text-white"
                   data-modal-toggle="filterModal"
                 >

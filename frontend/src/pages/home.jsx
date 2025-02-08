@@ -17,7 +17,7 @@ export default function HomePage() {
             <Navbar />
             <Categories />
 
-            <div className="md:absolute md:top-24 md:left-1/4 md:z-10 md:w-1/2 md:mx-auto md:mt-10">
+            <div className=" sm:absolute sm:top-24 sm:left-1/4 sm:z-0 sm:w-1/2 sm:mx-auto sm:mt-10">
                 <Search onSearch={handleSearch} />
             </div>
 
