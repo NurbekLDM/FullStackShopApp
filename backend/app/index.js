@@ -245,6 +245,8 @@ app.get('/products/:id', async (req, res) => {
     }
 });
 
+
+// add product
 app.post('/addProduct', upload.single('image'), async (req, res) => {
     try {
         const { name, description, price, stock, category, tag_name } = req.body;
@@ -287,8 +289,6 @@ app.post('/addProduct', upload.single('image'), async (req, res) => {
         res.status(500).json({ message: 'Internal Server Error' });
     }
 });
-
-
 
 
 // delete product
@@ -340,7 +340,6 @@ app.delete('/deleteProduct/:id', async (req, res) => {
 });
 
 
-
 // update product
 app.put('/updateProduct/:id', upload.single('image'), async (req, res) => {
     const id = req.params.id;
@@ -350,7 +349,7 @@ app.put('/updateProduct/:id', upload.single('image'), async (req, res) => {
     try {
         let imageUrl = null;
 
-        // Check if a file is uploaded and its format
+
         if (file) {
             const allowedMimeTypes = ['image/jpeg', 'image/png', 'image/gif'];
             if (!allowedMimeTypes.includes(file.mimetype)) {
@@ -359,28 +358,45 @@ app.put('/updateProduct/:id', upload.single('image'), async (req, res) => {
                 });
             }
 
-            const filePath = `products/${id}/${Date.now()}-${file.originalname.replace(/[{}<>]/g, '')}`;
+            // Fayl nomini yaratish
+            const fileName = `${Date.now()}-${file.originalname}`;
+
+            // Eski rasmni o‘chirish (ixtiyoriy)
+            const { data: oldProduct, error: fetchError } = await supabase
+                .from('products')
+                .select('image_data')
+                .eq('id', id)
+                .single();
+
+            if (fetchError) throw fetchError;
+
+            if (oldProduct?.image_data) {
+                const oldImagePath = oldProduct.image_data.split('/storage/v1/object/public/images/')[1]; // URL'dan fayl nomini olish
+                if (oldImagePath) {
+                    await supabase.storage.from('images').remove([oldImagePath]);
+                }
+            }
+
+            // Yangi rasmni yuklash
             const { data: uploadData, error: uploadError } = await supabase
                 .storage
                 .from('images')
-                .upload(filePath, file.buffer, {
+                .upload(fileName, file.buffer, {
                     contentType: file.mimetype,
                 });
 
             if (uploadError) throw uploadError;
 
-            const { data: urlData } = supabase
-                .storage
-                .from('product-images')
-                .getPublicUrl(filePath);
-
+            // Yangi rasm URL'ni olish
+            const { data: urlData } = supabase.storage.from('images').getPublicUrl(fileName);
             imageUrl = urlData.publicUrl;
         }
 
-        // Update the product
+        // Yangilanishi kerak bo‘lgan maydonlar
         const updateFields = { name, description, price, stock, category, tag_name };
-        if (imageUrl) updateFields.image_data = imageUrl;
+        if (imageUrl) updateFields.image_data = imageUrl; // Agar yangi rasm bo‘lsa, yangilash
 
+        // Mahsulotni yangilash
         const { data, error } = await supabase
             .from('products')
             .update(updateFields)
