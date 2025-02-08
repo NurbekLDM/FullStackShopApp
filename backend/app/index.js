@@ -295,7 +295,32 @@ app.post('/addProduct', upload.single('image'), async (req, res) => {
 app.delete('/deleteProduct/:id', async (req, res) => {
     const id = req.params.id;
 
-    try{
+    try {
+
+        const { data: product, error: fetchError } = await supabase
+            .from('products')
+            .select('image_data')
+            .eq('id', id)
+            .single();
+
+        if (fetchError) throw fetchError;
+
+
+        if (product?.image_data) {
+
+            const imageUrlParts = product.image_data.split('/');
+            const fileName = imageUrlParts.slice(4).join('/');
+
+
+            const { error: deleteError } = await supabase
+                .storage
+                .from('images')
+                .remove([fileName]);
+
+            if (deleteError) throw deleteError;
+        }
+
+
         const { data, error } = await supabase
             .from('products')
             .delete()
@@ -304,13 +329,16 @@ app.delete('/deleteProduct/:id', async (req, res) => {
 
         if (error) throw error;
 
-        res.json(data);
-    } catch (error){
+        res.json({ message: 'Product deleted successfully', data });
+
+    } catch (error) {
+        console.error("Error deleting product:", error);
         res.status(500).json({
             message: 'Internal Server Error'
         });
     }
 });
+
 
 
 // update product
