@@ -339,7 +339,6 @@ app.delete('/deleteProduct/:id', async (req, res) => {
     }
 });
 
-
 // update product
 app.put('/updateProduct/:id', upload.single('image'), async (req, res) => {
     const id = req.params.id;
@@ -349,7 +348,16 @@ app.put('/updateProduct/:id', upload.single('image'), async (req, res) => {
     try {
         let imageUrl = null;
 
+        // Eski mahsulotni olish
+        const { data: oldProduct, error: fetchError } = await supabase
+            .from('products')
+            .select('image_data')
+            .eq('id', id)
+            .single();
 
+        if (fetchError) throw fetchError;
+
+        // Agar yangi rasm yuklangan bo‘lsa
         if (file) {
             const allowedMimeTypes = ['image/jpeg', 'image/png', 'image/gif'];
             if (!allowedMimeTypes.includes(file.mimetype)) {
@@ -358,26 +366,20 @@ app.put('/updateProduct/:id', upload.single('image'), async (req, res) => {
                 });
             }
 
-            // Fayl nomini yaratish
             const fileName = `${Date.now()}-${file.originalname}`;
 
-            // Eski rasmni o‘chirish (ixtiyoriy)
-            const { data: oldProduct, error: fetchError } = await supabase
-                .from('products')
-                .select('image_data')
-                .eq('id', id)
-                .single();
-
-            if (fetchError) throw fetchError;
-
+            // **1. Eski rasmni o‘chirish (agar mavjud bo‘lsa)**
             if (oldProduct?.image_data) {
                 const oldImagePath = oldProduct.image_data.split('/storage/v1/object/public/images/')[1]; // URL'dan fayl nomini olish
                 if (oldImagePath) {
-                    await supabase.storage.from('images').remove([oldImagePath]);
+                    const { error: deleteError } = await supabase.storage.from('images').remove([oldImagePath]);
+                    if (deleteError) {
+                        console.error('Error deleting old image:', deleteError);
+                    }
                 }
             }
 
-            // Yangi rasmni yuklash
+            // **2. Yangi rasm yuklash**
             const { data: uploadData, error: uploadError } = await supabase
                 .storage
                 .from('images')
@@ -387,16 +389,15 @@ app.put('/updateProduct/:id', upload.single('image'), async (req, res) => {
 
             if (uploadError) throw uploadError;
 
-            // Yangi rasm URL'ni olish
+            // **3. Yangi rasm URL'ni olish**
             const { data: urlData } = supabase.storage.from('images').getPublicUrl(fileName);
             imageUrl = urlData.publicUrl;
         }
 
-        // Yangilanishi kerak bo‘lgan maydonlar
+        // **4. Mahsulot ma'lumotlarini yangilash**
         const updateFields = { name, description, price, stock, category, tag_name };
         if (imageUrl) updateFields.image_data = imageUrl; // Agar yangi rasm bo‘lsa, yangilash
 
-        // Mahsulotni yangilash
         const { data, error } = await supabase
             .from('products')
             .update(updateFields)
@@ -413,6 +414,7 @@ app.put('/updateProduct/:id', upload.single('image'), async (req, res) => {
         });
     }
 });
+
 
 
 // get all products
