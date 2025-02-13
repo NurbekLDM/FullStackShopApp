@@ -11,7 +11,7 @@ export default function Products({searchTerm}) {
     setSearchQuery(query);
     setLoading(true);
     try {
-      const results = await searchProducts(query); // searchProducts API ni chaqiramiz
+      const results = await searchProducts(query);
       setProducts(results);
     } catch (err) {
       setError("Failed to fetch search results");
@@ -31,7 +31,7 @@ export default function Products({searchTerm}) {
   const [cart, setCart] = useState([]);
   const [favourites, setFavourites] = useState([]);
 
-  // Fetch cart and favourites from localStorage
+
   useEffect(() => {
     const savedCart = JSON.parse(localStorage.getItem("cart")) || [];
     const savedFavourites = JSON.parse(localStorage.getItem("favourites")) || [];
@@ -39,7 +39,7 @@ export default function Products({searchTerm}) {
     setFavourites(savedFavourites);
   }, []);
 
-  // Handle quantity change
+
   const handleQuantity = (productId, action) => {
     const newCart = cart.map(item => {
       if (item.id === productId) {
@@ -50,13 +50,13 @@ export default function Products({searchTerm}) {
         return { ...item, quantity: newQuantity };
       }
       return item;
-    }).filter(item => item.quantity > 0); // 0 bo'lsa olib tashlaymiz
+    }).filter(item => item.quantity > 0); 
 
     setCart(newCart);
     localStorage.setItem("cart", JSON.stringify(newCart));
   };
 
-  // Savatga qo'shish
+
   const handleAddToCart = (product) => {
     const existingItem = cart.find(item => item.id === product.id);
     let newCart;
@@ -73,14 +73,14 @@ export default function Products({searchTerm}) {
         name: product.name,
         price: product.price,
         quantity: 1
-      }]; // To'liq obyekt strukturi
+      }]; 
     }
 
-    localStorage.setItem("cart", JSON.stringify(newCart)); // JSON formatida saqlash
+    localStorage.setItem("cart", JSON.stringify(newCart)); 
     setCart(newCart);
   };
 
-  // Product card ichidagi miqdor kontrolleri
+
   const renderQuantityControls = (productId) => {
     const cartItem = cart.find(item => item.id === productId);
     return (
@@ -102,7 +102,7 @@ export default function Products({searchTerm}) {
     );
   };
 
-  // Favorite toggle
+
   const handleFavourite = (product) => {
     const isFavorited = favourites.some(item => item.id === product.id);
     let newFavourites;
@@ -117,7 +117,7 @@ export default function Products({searchTerm}) {
     localStorage.setItem("favourites", JSON.stringify(newFavourites));
   };
 
-  // Favorite holatini tekshirish
+
   const isFavorited = (productId) => {
     return favourites.some(item => item.id === productId);
   };
@@ -126,14 +126,14 @@ export default function Products({searchTerm}) {
     navigate(`/product/${productId}`);
   }
 
-  // Handle filter button and modal
+
   const toggleFilterModal = (show) => {
     if (filterModalRef.current) {
       filterModalRef.current.classList.toggle("hidden", !show);
     }
   };
 
-  // Toggle sort dropdown
+
   const toggleSortDropdown = () => {
     setIsSortOpen(!isSortOpen);
   };
@@ -142,13 +142,13 @@ export default function Products({searchTerm}) {
 
 
 
-  // Fetch products
+
   useEffect(() => {
     if (searchTerm) {
       const fetchSearchResults = async () => {
         setLoading(true);
         try {
-          const results = await searchProducts(searchTerm); // searchProducts API ni chaqiramiz
+          const results = await searchProducts(searchTerm);
           setProducts(results);
         } catch (err) {
           setError("Failed to fetch search results");
@@ -159,7 +159,7 @@ export default function Products({searchTerm}) {
       };
       fetchSearchResults();
     } else {
-      // Agar qidiruv boʻsh boʻlsa, barcha mahsulotlarni koʻrsatamiz
+
       const fetchAllProducts = async () => {
         setLoading(true);
         try {
@@ -174,7 +174,7 @@ export default function Products({searchTerm}) {
       };
       fetchAllProducts();
     }
-  }, [searchTerm]); // searchTerm o'zgarganida useEffect qayta ishlaydi
+  }, [searchTerm]); 
 
 
   if (loading) return <div className="text-center text-gray-500 mb-20">Loading...</div>;
@@ -284,52 +284,48 @@ export default function Products({searchTerm}) {
                       aria-labelledby="sortDropdownButton"
                   >
                     <li>
-                      <a
-                          href="#"
+                      <p
+                        
                           className="group inline-flex w-full items-center rounded-md px-3 py-2 text-sm text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-600 dark:hover:text-white"
                       >
                         The most popular
-                      </a>
+                      </p>
                     </li>
                     <li>
-                      <a
-                          href="#"
+                      <p
                           className="group inline-flex w-full items-center rounded-md px-3 py-2 text-sm text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-600 dark:hover:text-white"
                       >
                         Newest
-                      </a>
+                      </p>
                     </li>
                     <li>
-                      <a
-                          href="#"
+                      <p
                           className="group inline-flex w-full items-center rounded-md px-3 py-2 text-sm text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-600 dark:hover:text-white"
                       >
                         Increasing price
-                      </a>
+                      </p>
                     </li>
                     <li>
-                      <a
-                          href="#"
+                      <p
                           className="group inline-flex w-full items-center rounded-md px-3 py-2 text-sm text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-600 dark:hover:text-white"
                       >
                         Decreasing price
-                      </a>
+                      </p>
                     </li>
                     <li>
-                      <a
-                          href="#"
+                      <p                          
                           className="group inline-flex w-full items-center rounded-md px-3 py-2 text-sm text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-600 dark:hover:text-white"
                       >
                         No. reviews
-                      </a>
+                      </p>
                     </li>
                     <li>
-                      <a
-                          href="#"
+                      <p
+                          
                           className="group inline-flex w-full items-center rounded-md px-3 py-2 text-sm text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-600 dark:hover:text-white"
                       >
                         Discount %
-                      </a>
+                      </p>
                     </li>
                   </ul>
                 </div>
@@ -343,7 +339,7 @@ export default function Products({searchTerm}) {
            {products.map((product) => (
                     <div className="rounded-lg lg:w-1/4 md:w-1/2 sm:w-1/4 border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800">
                       <div className="h-56 w-full">
-                        <a href="#" onClick={(e) => {
+                        <p  onClick={(e) => {
                           e.preventDefault();
                           handleProduct(product.id);
                         }}>
@@ -353,7 +349,7 @@ export default function Products({searchTerm}) {
                               src={product.image_data}
                               alt=""
                           />
-                        </a>
+                        </p>
                       </div>
                       <div className="pt-6">
                         <div className="mb-4 flex items-center justify-between gap-4">
@@ -438,13 +434,12 @@ export default function Products({searchTerm}) {
                           </div>
                         </div>
 
-                        <a
-                          href="#"
+                        <p
                           className="text-lg font-semibold leading-tight text-gray-900 hover:underline dark:text-white"
                         name="name"
                         >
                           {product.name}
-                        </a>
+                        </p>
 
                         <div className="mt-2 flex items-center gap-2">
                           <div className="flex items-center">

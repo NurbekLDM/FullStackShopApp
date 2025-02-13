@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
+import { getComments } from "../servers/comment";
 
 export default function ProductComments() {
   const [comments, setComments] = useState([]);
@@ -7,7 +8,7 @@ export default function ProductComments() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
 
-  useEffect(() => {
+  function handleFirstClick() {
     const button = document.querySelector("order-type");
     const handleClick = () => {
       setIsDropdownOpen((prevState) => !prevState);
@@ -20,9 +21,9 @@ export default function ProductComments() {
         button.removeEventListener("click", handleClick);
       }
     };
-  }, []);
+  }
 
-  useEffect(() => {
+  function handleSecondClick() {
     const button = document.getElementById("actionsMenuDropdown1");
     const handleClick = () => {
       setIsOpen((prevState) => !prevState);
@@ -35,9 +36,9 @@ export default function ProductComments() {
         button.removeEventListener("click", handleClick);
       }
     };
-  }, []);
+  }
 
-  useEffect(() => {
+  function handleThirdClick() {
     const editCloseBtn = document.getElementById("editCloseBtn");
     editCloseBtn.addEventListener("click", () => {
       setIsEdited(false);
@@ -54,9 +55,9 @@ export default function ProductComments() {
         editButton.removeEventListener("click", handleClick);
       }
     };
-  }, []);
+  }
 
-  useEffect(() => {
+  function handleFourthClick() {
     const deleteCloseBtn = document.getElementById("deleteCloseBtn");
     deleteCloseBtn.addEventListener("click", () => {
       setIsDeleted(false);
@@ -73,7 +74,7 @@ export default function ProductComments() {
         deleteButton.removeEventListener("click", handleClick);
       }
     };
-  }, []);
+  }
 
   return (
     <div>
@@ -209,6 +210,7 @@ export default function ProductComments() {
                       data-dropdown-toggle="dropdownOrder1"
                       type="button"
                       className="inline-flex h-7 w-7 items-center justify-center rounded-lg text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+                      onClick={handleSecondClick}
                     >
                       <span className="sr-only"> Actions </span>
                       <svg
@@ -246,6 +248,7 @@ export default function ProductComments() {
                             data-modal-target="editReviewModal"
                             data-modal-toggle="editReviewModal"
                             className="group inline-flex w-full items-center rounded-md px-3 py-2 text-sm text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-600 dark:hover:text-white"
+                            onClick={handleThirdClick}
                           >
                             <svg
                               className="me-1.5 h-4 w-4 text-gray-400 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white"
@@ -274,6 +277,7 @@ export default function ProductComments() {
                             data-modal-target="deleteReviewModal"
                             data-modal-toggle="deleteReviewModal"
                             className="group inline-flex w-full items-center rounded-md px-3 py-2 text-sm text-red-600 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-red-500"
+                            onClick={handleFourthClick}
                           >
                             <svg
                               className="me-1.5 h-4 w-4"
@@ -375,6 +379,7 @@ export default function ProductComments() {
                       data-dropdown-toggle="dropdownOrder2"
                       type="button"
                       className="inline-flex h-7 w-7 items-center justify-center rounded-lg text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+                      onClick={handleSecondClick}
                     >
                       <span className="sr-only"> Actions </span>
                       <svg
@@ -409,6 +414,7 @@ export default function ProductComments() {
                             data-modal-target="editReviewModal"
                             data-modal-toggle="editReviewModal"
                             className="group inline-flex w-full items-center rounded-md px-3 py-2 text-sm text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-600 dark:hover:text-white"
+                            onClick={handleThirdClick}
                           >
                             <svg
                               className="me-1.5 h-4 w-4 text-gray-400 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white"
@@ -436,6 +442,7 @@ export default function ProductComments() {
                             data-modal-target="deleteReviewModal"
                             data-modal-toggle="deleteReviewModal"
                             className="group inline-flex w-full items-center rounded-md px-3 py-2 text-sm text-red-600 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-red-500"
+                            onClick={handleFourthClick}
                           >
                             <svg
                               className="me-1.5 h-4 w-4"
@@ -542,6 +549,7 @@ export default function ProductComments() {
                       data-dropdown-toggle="dropdownOrder3"
                       type="button"
                       className="inline-flex h-7 w-7 items-center justify-center rounded-lg text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+                      onClick={handleSecondClick}
                     >
                       <span className="sr-only"> Actions </span>
                       <svg
@@ -576,6 +584,7 @@ export default function ProductComments() {
                             data-modal-target="editReviewModal"
                             data-modal-toggle="editReviewModal"
                             className="group inline-flex w-full items-center rounded-md px-3 py-2 text-sm text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-600 dark:hover:text-white"
+                            onClick={handleThirdClick}
                           >
                             <svg
                               className="me-1.5 h-4 w-4 text-gray-400 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white"
@@ -603,6 +612,7 @@ export default function ProductComments() {
                             data-modal-target="deleteReviewModal"
                             data-modal-toggle="deleteReviewModal"
                             className="group inline-flex w-full items-center rounded-md px-3 py-2 text-sm text-red-600 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-red-500"
+                            onClick={handleFourthClick}
                           >
                             <svg
                               className="me-1.5 h-4 w-4"
@@ -702,6 +712,7 @@ export default function ProductComments() {
                       data-dropdown-toggle="dropdownOrder4"
                       type="button"
                       className="inline-flex h-7 w-7 items-center justify-center rounded-lg text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+                      onClick={handleSecondClick}
                     >
                       <span className="sr-only"> Actions </span>
                       <svg
@@ -736,6 +747,7 @@ export default function ProductComments() {
                             data-modal-target="editReviewModal"
                             data-modal-toggle="editReviewModal"
                             className="group inline-flex w-full items-center rounded-md px-3 py-2 text-sm text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-600 dark:hover:text-white"
+                            onClick={handleThirdClick}
                           >
                             <svg
                               className="me-1.5 h-4 w-4 text-gray-400 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white"
@@ -763,6 +775,7 @@ export default function ProductComments() {
                             data-modal-target="deleteReviewModal"
                             data-modal-toggle="deleteReviewModal"
                             className="group inline-flex w-full items-center rounded-md px-3 py-2 text-sm text-red-600 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-red-500"
+                            onClick={handleFourthClick}
                           >
                             <svg
                               className="me-1.5 h-4 w-4"
@@ -862,6 +875,7 @@ export default function ProductComments() {
                       data-dropdown-toggle="dropdownOrder5"
                       type="button"
                       className="inline-flex h-7 w-7 items-center justify-center rounded-lg text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+                      onClick={handleSecondClick}
                     >
                       <span className="sr-only"> Actions </span>
                       <svg
@@ -896,6 +910,7 @@ export default function ProductComments() {
                             data-modal-target="editReviewModal"
                             data-modal-toggle="editReviewModal"
                             className="group inline-flex w-full items-center rounded-md px-3 py-2 text-sm text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-600 dark:hover:text-white"
+                            onClick={handleThirdClick}
                           >
                             <svg
                               className="me-1.5 h-4 w-4 text-gray-400 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white"
@@ -923,6 +938,7 @@ export default function ProductComments() {
                             data-modal-target="deleteReviewModal"
                             data-modal-toggle="deleteReviewModal"
                             className="group inline-flex w-full items-center rounded-md px-3 py-2 text-sm text-red-600 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-red-500"
+                            onClick={handleFourthClick}
                           >
                             <svg
                               className="me-1.5 h-4 w-4"
@@ -1034,6 +1050,7 @@ export default function ProductComments() {
                       data-dropdown-toggle="dropdownOrder6"
                       type="button"
                       className="inline-flex h-7 w-7 items-center justify-center rounded-lg text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+                      onClick={handleSecondClick}
                     >
                       <span className="sr-only"> Actions </span>
                       <svg
@@ -1068,6 +1085,7 @@ export default function ProductComments() {
                             data-modal-target="editReviewModal"
                             data-modal-toggle="editReviewModal"
                             className="group inline-flex w-full items-center rounded-md px-3 py-2 text-sm text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-600 dark:hover:text-white"
+                            onClick={handleThirdClick}
                           >
                             <svg
                               className="me-1.5 h-4 w-4 text-gray-400 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white"
@@ -1095,6 +1113,7 @@ export default function ProductComments() {
                             data-modal-target="deleteReviewModal"
                             data-modal-toggle="deleteReviewModal"
                             className="group inline-flex w-full items-center rounded-md px-3 py-2 text-sm text-red-600 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-red-500"
+                            onClick={handleFourthClick}
                           >
                             <svg
                               className="me-1.5 h-4 w-4"
@@ -1200,6 +1219,7 @@ export default function ProductComments() {
                       data-dropdown-toggle="dropdownOrder7"
                       type="button"
                       className="inline-flex h-7 w-7 items-center justify-center rounded-lg text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+                      onClick={handleSecondClick}
                     >
                       <span className="sr-only"> Actions </span>
                       <svg
@@ -1234,6 +1254,7 @@ export default function ProductComments() {
                             data-modal-target="editReviewModal"
                             data-modal-toggle="editReviewModal"
                             className="group inline-flex w-full items-center rounded-md px-3 py-2 text-sm text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-600 dark:hover:text-white"
+                            onClick={handleThirdClick}
                           >
                             <svg
                               className="me-1.5 h-4 w-4 text-gray-400 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white"
@@ -1261,6 +1282,7 @@ export default function ProductComments() {
                             data-modal-target="deleteReviewModal"
                             data-modal-toggle="deleteReviewModal"
                             className="group inline-flex w-full items-center rounded-md px-3 py-2 text-sm text-red-600 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-red-500"
+                            onClick={handleFourthClick}
                           >
                             <svg
                               className="me-1.5 h-4 w-4"
@@ -1361,6 +1383,7 @@ export default function ProductComments() {
                       data-dropdown-toggle="dropdownOrder8"
                       type="button"
                       className="inline-flex h-7 w-7 items-center justify-center rounded-lg text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+                      onClick={handleSecondClick}
                     >
                       <span className="sr-only"> Actions </span>
                       <svg
@@ -1395,6 +1418,7 @@ export default function ProductComments() {
                             data-modal-target="editReviewModal"
                             data-modal-toggle="editReviewModal"
                             className="group inline-flex w-full items-center rounded-md px-3 py-2 text-sm text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-600 dark:hover:text-white"
+                            onClick={handleThirdClick}
                           >
                             <svg
                               className="me-1.5 h-4 w-4 text-gray-400 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white"
@@ -1422,6 +1446,7 @@ export default function ProductComments() {
                             data-modal-target="deleteReviewModal"
                             data-modal-toggle="deleteReviewModal"
                             className="group inline-flex w-full items-center rounded-md px-3 py-2 text-sm text-red-600 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-red-500"
+                            onClick={handleFourthClick}
                           >
                             <svg
                               className="me-1.5 h-4 w-4"
@@ -1521,6 +1546,7 @@ export default function ProductComments() {
                       data-dropdown-toggle="dropdownOrder9"
                       type="button"
                       className="inline-flex h-7 w-7 items-center justify-center rounded-lg text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+                      onClick={handleSecondClick}
                     >
                       <span className="sr-only"> Actions </span>
                       <svg
@@ -1555,6 +1581,7 @@ export default function ProductComments() {
                             data-modal-target="editReviewModal"
                             data-modal-toggle="editReviewModal"
                             className="group inline-flex w-full items-center rounded-md px-3 py-2 text-sm text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-600 dark:hover:text-white"
+                            onClick={handleThirdClick}
                           >
                             <svg
                               className="me-1.5 h-4 w-4 text-gray-400 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white"
@@ -1582,6 +1609,7 @@ export default function ProductComments() {
                             data-modal-target="deleteReviewModal"
                             data-modal-toggle="deleteReviewModal"
                             className="group inline-flex w-full items-center rounded-md px-3 py-2 text-sm text-red-600 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-red-500"
+                            onClick={handleFourthClick}
                           >
                             <svg
                               className="me-1.5 h-4 w-4"
@@ -1699,6 +1727,7 @@ export default function ProductComments() {
                       data-dropdown-toggle="dropdownOrder10"
                       type="button"
                       className="inline-flex h-7 w-7 items-center justify-center rounded-lg text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+                      onClick={handleSecondClick}
                     >
                       <span className="sr-only"> Actions </span>
                       <svg
@@ -1733,6 +1762,7 @@ export default function ProductComments() {
                             data-modal-target="editReviewModal"
                             data-modal-toggle="editReviewModal"
                             className="group inline-flex w-full items-center rounded-md px-3 py-2 text-sm text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-600 dark:hover:text-white"
+                            onClick={handleThirdClick}
                           >
                             <svg
                               className="me-1.5 h-4 w-4 text-gray-400 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white"
@@ -1760,6 +1790,7 @@ export default function ProductComments() {
                             data-modal-target="deleteReviewModal"
                             data-modal-toggle="deleteReviewModal"
                             className="group inline-flex w-full items-center rounded-md px-3 py-2 text-sm text-red-600 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-red-500"
+                            onClick={handleFourthClick}
                           >
                             <svg
                               className="me-1.5 h-4 w-4"
